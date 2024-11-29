@@ -27,6 +27,13 @@ model User {
   @@map("users")
 }
 
+model Authentication {
+  token String @id @db.VarChar(300)
+  expiresAt DateTime
+
+  @@map("authentications")
+}
+
 enum Role {
   ADMIN
   SUPER
