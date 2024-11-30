@@ -23,6 +23,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
+  orders Order[]
 
   @@map("users")
 }
@@ -32,6 +33,55 @@ model Authentication {
   expiresAt DateTime
 
   @@map("authentications")
+}
+
+model Order {
+  id String @id @db.VarChar(255)
+  userId String
+  size Int
+  layer Int?
+	isUseTopper Boolean
+  pickupTime BigInt
+  price Float
+  downPayment Float
+  remainingPayment Float
+  telp String @db.VarChar(15)
+  notes String?
+  text String @db.VarChar(255)
+  textColor String @db.VarChar(120)
+  pictures Picture[]
+  progresses OrderProgress[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("orders")
+}
+
+model Picture {
+  id String @id @db.VarChar(255)
+  orderId String
+  url String
+  Order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("pictures")
+}
+
+model Progress {
+  id String @id @db.VarChar(255)
+  name String
+  isFinish Boolean
+  orders OrderProgress[]
+
+  @@map("progresses")
+}
+
+model OrderProgress {
+  orderId String
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  progressId String
+  progress Progress @relation(fields: [progressId], references: [id], onDelete: Cascade)
+
+  @@id([orderId, progressId])
+  @@map("order_progresses")
 }
 
 enum Role {
