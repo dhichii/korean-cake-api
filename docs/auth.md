@@ -1,4 +1,4 @@
-# User API Spec
+# Auth API Spec
 
 ## Register
 Endpoint: POST /api/v1/auth/register
