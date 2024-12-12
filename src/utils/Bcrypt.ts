@@ -12,7 +12,7 @@ export class Bcrypt {
   async compare(password: string, hashedPassword: string) {
     const isCorrect = await bcrypt.compare(password, hashedPassword);
     if (!isCorrect) {
-      throw new UnauthorizedException('email or password incorrect');
+      throw new UnauthorizedException('username or password incorrect');
     }
   }
 }
