@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { IUserRepository } from '../domain/user.repository.interface';
 import { AddUserReq, mapAddUserReq } from '../interface/http/user.request';
 import {
@@ -13,7 +13,7 @@ import { UserValidation } from './user.validation';
 @Injectable()
 export class UserService implements IUserService {
   constructor(
-    private userRepository: IUserRepository,
+    @Inject('IUserRepository') private userRepository: IUserRepository,
     private validationService: ValidationService,
   ) {}
 
