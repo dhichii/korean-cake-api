@@ -62,10 +62,18 @@ export class UserService implements IUserService {
   async getByUsername(username: string): Promise<UserWithPasswordResponse> {
     this.validationService.validate(UserValidation.GET_BY_USERNAME, username);
 
-    const { createdAt, updatedAt, ...data } =
-      await this.userRepository.getByUsername(username);
+    const data = await this.userRepository.getByUsername(username);
 
-    return { ...data, createdAt, updatedAt };
+    return {
+      id: data.id,
+      name: data.name,
+      username: data.username,
+      email: data.email,
+      role: data.role,
+      password: data.password,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
   }
 
   async deleteById(id: string): Promise<void> {
