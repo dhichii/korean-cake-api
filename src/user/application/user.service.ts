@@ -6,8 +6,8 @@ import {
   UserWithPasswordResponse,
 } from '../interface/http/user.response';
 import { IUserService } from '../domain/user.service.interface';
-import { Bcrypt } from 'src/utils/Bcrypt';
-import { ValidationService } from 'src/common/validation.service';
+import { Bcrypt } from '../../utils/Bcrypt';
+import { ValidationService } from '../../common/validation.service';
 import { UserValidation } from './user.validation';
 
 @Injectable()
