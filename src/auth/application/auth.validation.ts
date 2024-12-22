@@ -1,4 +1,4 @@
-import { USERNAME_REGEX } from 'src/utils/regex';
+import { USERNAME_REGEX } from '../../utils/regex';
 import { z, ZodType } from 'zod';
 
 export class AuthValidation {
