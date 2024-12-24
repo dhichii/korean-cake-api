@@ -12,7 +12,6 @@ import { RefreshReq, RegisterReq } from './auth.request';
 import { IAuthService } from '../../domain/auth.service.interface';
 import { LocalAuthGuard } from '../../guards/local.guard';
 import { RefreshJwtGuard } from '../../guards/refresh-jwt.guard';
-import { JwtGuard } from '../../guards/jwt.guard';
 import { Request, Response } from 'express';
 import { JWTSignPayload } from './auth.response';
 
@@ -76,7 +75,7 @@ export class AuthController {
       });
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(RefreshJwtGuard)
   @Post('logout')
   @HttpCode(201)
   async logout(@Req() req: Request, @Res() res: Response) {
