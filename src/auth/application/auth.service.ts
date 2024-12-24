@@ -40,7 +40,7 @@ export class AuthService implements IAuthService {
     } catch (e: unknown) {
       if (e instanceof HttpException) {
         if (e.message === 'user not found') {
-          throw new UnauthorizedException('username or password is incorrect');
+          throw new UnauthorizedException('username or password incorrect');
         }
       }
 
