@@ -14,6 +14,7 @@ import { LocalAuthGuard } from '../../guards/local.guard';
 import { RefreshJwtGuard } from '../../guards/refresh-jwt.guard';
 import { Request, Response } from 'express';
 import { JWTSignPayload } from './auth.response';
+import { createAuthCookieOpts } from '../../../utils/cookie';
 
 @Controller('/api/v1/auth')
 export class AuthController {
@@ -34,19 +35,12 @@ export class AuthController {
     const user = req.user as JWTSignPayload;
     const { access, refresh, exp } = await this.authService.login(user);
 
-    return res
-      .cookie('refresh', refresh, {
-        httpOnly: true,
-        sameSite: process.env.ENV === 'prod' ? 'none' : 'strict',
-        maxAge: exp,
-        secure: process.env.ENV === 'prod' ? true : false,
-      })
-      .json({
-        status: 'success',
-        data: {
-          access,
-        },
-      });
+    return res.cookie('refresh', refresh, createAuthCookieOpts(exp)).json({
+      status: 'success',
+      data: {
+        access,
+      },
+    });
   }
 
   @UseGuards(RefreshJwtGuard)
@@ -60,19 +54,12 @@ export class AuthController {
 
     const { access, refresh, exp } = await this.authService.refresh(payload);
 
-    return res
-      .cookie('refresh', refresh, {
-        httpOnly: true,
-        sameSite: process.env.ENV === 'prod' ? 'none' : 'strict',
-        maxAge: exp,
-        secure: process.env.ENV === 'prod' ? true : false,
-      })
-      .json({
-        status: 'success',
-        data: {
-          access,
-        },
-      });
+    return res.cookie('refresh', refresh, createAuthCookieOpts(exp)).json({
+      status: 'success',
+      data: {
+        access,
+      },
+    });
   }
 
   @UseGuards(RefreshJwtGuard)
