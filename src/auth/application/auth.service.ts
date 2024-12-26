@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ValidationService } from '../../common/validation.service';
 import { IUserService } from '../../user/domain/user.service.interface';
-import { RefreshReq, RegisterReq } from '../interface/http/auth.request';
+import { RefreshReq, RegisterDto } from '../interface/http/auth.request';
 import { TokenResponse, JWTSignPayload } from '../interface/http/auth.response';
 import { IAuthService } from '../domain/auth.service.interface';
 import { Bcrypt } from '../../utils/Bcrypt';
@@ -48,7 +48,7 @@ export class AuthService implements IAuthService {
     }
   }
 
-  async register(req: RegisterReq): Promise<void> {
+  async register(req: RegisterDto): Promise<void> {
     this.validationService.validate(AuthValidation.REGISTER, req);
 
     const data = {
