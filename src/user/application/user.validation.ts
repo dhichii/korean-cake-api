@@ -1,3 +1,4 @@
+import { Role } from '@prisma/client';
 import { USERNAME_REGEX } from '../../utils/regex';
 import { z, ZodType } from 'zod';
 
@@ -10,6 +11,7 @@ export class UserValidation {
       .regex(USERNAME_REGEX, 'username can only be letters and numbers.'),
     email: z.string().email(),
     password: z.string().min(8),
+    role: z.enum([Role.ADMIN, Role.USER]).optional(),
   });
 
   static readonly GET_BY_ID: ZodType = z.string().uuid();

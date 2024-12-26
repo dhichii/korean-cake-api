@@ -8,6 +8,7 @@ export type AddUserReq = {
   username: string;
   email: string;
   password: string;
+  role?: Role;
 };
 
 export async function mapAddUserReq(req: AddUserReq): Promise<UserEntity> {
@@ -19,6 +20,6 @@ export async function mapAddUserReq(req: AddUserReq): Promise<UserEntity> {
     username: req.username,
     email: req.email,
     password: password,
-    role: Role.USER,
+    role: !req.role ? Role.USER : req.role,
   };
 }
