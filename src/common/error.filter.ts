@@ -24,7 +24,12 @@ export class ErrorFilter implements ExceptionFilter {
       case exception instanceof Prisma.PrismaClientKnownRequestError:
         if (exception.code === 'P2002') {
           return response.status(400).json({
-            errors: [{ message: `${exception.meta?.target} is already exist` }],
+            errors: [
+              {
+                path: [exception.meta?.target],
+                message: `${exception.meta?.target} is already exist`,
+              },
+            ],
           });
         } else {
           return response.status(500).json({
