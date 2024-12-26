@@ -16,6 +16,11 @@ async function bootstrap() {
     .setTitle('Korean Cake')
     .setDescription('The Korean Cake API Documentation')
     .setVersion('1.0.0')
+    .addBearerAuth({
+      name: 'Authorization',
+      type: 'apiKey',
+    })
+    .addCookieAuth('refresh')
     .build();
 
   const document = SwaggerModule.createDocument(app, documentConfig);
