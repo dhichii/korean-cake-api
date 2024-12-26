@@ -8,21 +8,56 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { RefreshReq, RegisterReq } from './auth.request';
+import { RefreshReq, RegisterDto } from './auth.request';
 import { IAuthService } from '../../domain/auth.service.interface';
 import { LocalAuthGuard } from '../../guards/local.guard';
 import { RefreshJwtGuard } from '../../guards/refresh-jwt.guard';
 import { Request, Response } from 'express';
-import { JWTSignPayload } from './auth.response';
+import {
+  JWTSignPayload,
+  LoginResponseDto,
+  RefreshResponseDto,
+} from './auth.response';
 import { createAuthCookieOpts } from '../../../utils/cookie';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiCookieAuth,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import {
+  InternalServerResponse,
+  InvalidCredentialResponse,
+  StatusResponseDto,
+  UnauthorizedResponse,
+  ValidationErrorResponse,
+} from '../../../common/api-response.dto';
 
+@ApiTags('Auth')
 @Controller('/api/v1/auth')
 export class AuthController {
   constructor(@Inject('IAuthService') private authService: IAuthService) {}
 
   @Post('register')
   @HttpCode(201)
-  async register(@Body() req: RegisterReq) {
+  @ApiOperation({ summary: 'register new account' })
+  @ApiCreatedResponse({
+    description: 'Successfully Registered',
+    type: StatusResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Validation Error',
+    type: ValidationErrorResponse,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+    type: InternalServerResponse,
+  })
+  async register(@Body() req: RegisterDto): Promise<StatusResponseDto> {
     await this.authService.register(req);
 
     return { status: 'success' };
@@ -31,7 +66,42 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(201)
-  async login(@Req() req: Request, @Res() res: Response) {
+  @ApiOperation({ summary: 'login and set refresh cookie' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        username: {
+          type: 'string',
+          example: 'example',
+        },
+        password: {
+          type: 'string',
+          example: 'verystrongpassword',
+        },
+      },
+    },
+  })
+  @ApiCreatedResponse({
+    description: 'Successfully Login',
+    type: LoginResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Validation Error',
+    type: ValidationErrorResponse,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid Credentials',
+    type: InvalidCredentialResponse,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+    type: InternalServerResponse,
+  })
+  async login(
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<Response<LoginResponseDto>> {
     const user = req.user as JWTSignPayload;
     const { access, refresh, exp } = await this.authService.login(user);
 
@@ -46,7 +116,24 @@ export class AuthController {
   @UseGuards(RefreshJwtGuard)
   @Post('refresh')
   @HttpCode(201)
-  async refresh(@Req() req: Request, @Res() res: Response) {
+  @ApiOperation({ summary: 'refresh and set refresh cookie' })
+  @ApiCookieAuth('refresh')
+  @ApiCreatedResponse({
+    description: 'Successfully Refresh',
+    type: RefreshResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid Token or Expired',
+    type: UnauthorizedResponse,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+    type: InternalServerResponse,
+  })
+  async refresh(
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<Response<RefreshResponseDto>> {
     const payload: RefreshReq = {
       refresh: req.cookies['refresh'],
       payload: req.user as JWTSignPayload,
@@ -65,7 +152,24 @@ export class AuthController {
   @UseGuards(RefreshJwtGuard)
   @Post('logout')
   @HttpCode(201)
-  async logout(@Req() req: Request, @Res() res: Response) {
+  @ApiOperation({ summary: 'logout' })
+  @ApiCookieAuth('refresh')
+  @ApiCreatedResponse({
+    description: 'Successfully Logout',
+    type: StatusResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid Token or Expired',
+    type: UnauthorizedResponse,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+    type: InternalServerResponse,
+  })
+  async logout(
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<Response<StatusResponseDto>> {
     const refresh = req.cookies['refresh'];
     await this.authService.logout(refresh);
 
