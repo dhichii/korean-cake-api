@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class StatusResponseDto {
   @ApiProperty({ description: 'Status of the response', example: 'success' })
-  status: string;
+  status: string = 'success';
 }
 
 export class ValidationErrorResponse {
