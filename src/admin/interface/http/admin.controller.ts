@@ -10,9 +10,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { IAdminService } from 'src/admin/domain/admin.service.interface';
-import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { RolesGuard } from 'src/common/roles.guard';
+import { IAdminService } from '../../../admin/domain/admin.service.interface';
+import { JwtGuard } from '../../../auth/guards/jwt.guard';
+import { RolesGuard } from '../../../common/roles.guard';
 import { CreateAdminDto } from './admin.request';
 import {
   CreateAdminResponseDto,
@@ -25,7 +25,7 @@ import {
   StatusResponseDto,
   UnauthorizedResponse,
   ValidationErrorResponse,
-} from 'src/common/api-response.dto';
+} from '../../../common/api-response.dto';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,

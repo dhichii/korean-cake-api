@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
-import { generateRandomPassword } from 'src/utils/password';
+import { generateRandomPassword } from '../../../utils/password';
 
 export class CreateAdminDto {
   @ApiProperty({ example: 'example' })

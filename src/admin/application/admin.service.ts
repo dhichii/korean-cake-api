@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IAdminService } from '../domain/admin.service.interface';
-import { IUserService } from 'src/user/domain/user.service.interface';
+import { IUserService } from '../../user/domain/user.service.interface';
 import {
   CreateAdminDto,
   mapCreateAdminDto,
