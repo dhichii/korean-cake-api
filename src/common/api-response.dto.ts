@@ -56,6 +56,11 @@ export class InvalidCredentialResponse {
   errors;
 }
 
+export class ForbiddenResponse {
+  @ApiProperty({ example: [{ message: 'Forbidden resource' }] })
+  errors;
+}
+
 export class InternalServerResponse {
   @ApiProperty({ example: [{ message: 'Internal Server Error' }] })
   errors;
