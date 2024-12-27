@@ -9,6 +9,7 @@ import { IUserService } from '../domain/user.service.interface';
 import { Bcrypt } from '../../utils/Bcrypt';
 import { ValidationService } from '../../common/validation.service';
 import { UserValidation } from './user.validation';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -26,8 +27,8 @@ export class UserService implements IUserService {
     return { id };
   }
 
-  async getAll(): Promise<UserResponse[]> {
-    const res = await this.userRepository.getAll();
+  async getAll(role?: Role): Promise<UserResponse[]> {
+    const res = await this.userRepository.getAll(role);
     const data = res.map((v) => {
       return {
         id: v.id,

@@ -1,8 +1,9 @@
+import { Role } from '@prisma/client';
 import { UserEntity } from './user.entity';
 
 export interface IUserRepository {
   add(data: UserEntity): Promise<string>;
-  getAll(): Promise<UserEntity[]>;
+  getAll(role?: Role): Promise<UserEntity[]>;
   getById(id: string): Promise<UserEntity>;
   getByUsername(username: string): Promise<UserEntity>;
   changeEmail(id: string, email: string): Promise<void>;
