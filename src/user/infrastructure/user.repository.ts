@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../../common/prisma.service';
 import { UserEntity } from '../domain/user.entity';
 import { IUserRepository } from '../domain/user.repository.interface';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
@@ -17,8 +18,8 @@ export class UserRepository implements IUserRepository {
     return id;
   }
 
-  async getAll(): Promise<UserEntity[]> {
-    return await this.db.user.findMany({ where: { deletedAt: null } });
+  async getAll(role?: Role): Promise<UserEntity[]> {
+    return await this.db.user.findMany({ where: { role, deletedAt: null } });
   }
 
   async getById(id: string): Promise<UserEntity> {
