@@ -10,7 +10,7 @@ import { LocalStrategy } from '../src/auth/strategies/local.strategy';
 import { JwtStrategy } from '../src/auth/strategies/jwt.strategy';
 import { RefreshJwtStrategy } from '../src/auth/strategies/refresh-jwt.strategy';
 import { CommonModule } from '../src/common/common.module';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
 import * as cookieParser from 'cookie-parser';
 
 describe('AuthController (e2e)', () => {
@@ -75,7 +75,7 @@ describe('AuthController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await new PrismaClient().user.deleteMany();
+    await new PrismaClient().user.deleteMany({ where: { role: Role.USER } });
     await new PrismaClient().authentication.deleteMany();
   });
 
