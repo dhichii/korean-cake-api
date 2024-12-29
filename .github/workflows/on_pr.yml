@@ -33,7 +33,7 @@ jobs:
         run: |
           npm install
           npm run migrate
-          npm run seed
+          # npm run seed
           mkdir public
           npm test
           npm run test:e2e
