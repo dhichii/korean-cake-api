@@ -24,12 +24,14 @@ import {
   ApiBody,
   ApiCookieAuth,
   ApiCreatedResponse,
+  ApiExtraModels,
   ApiInternalServerErrorResponse,
   ApiOperation,
-  ApiTags,
   ApiUnauthorizedResponse,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import {
+  ApiResponseDto,
   InternalServerResponse,
   InvalidCredentialResponse,
   StatusResponseDto,
@@ -37,8 +39,8 @@ import {
   ValidationErrorResponse,
 } from '../../../common/api-response.dto';
 
-@ApiTags('Auth')
 @Controller('/api/v1/auth')
+@ApiExtraModels(LoginResponseDto, RefreshResponseDto)
 export class AuthController {
   constructor(@Inject('IAuthService') private authService: IAuthService) {}
 
@@ -84,7 +86,18 @@ export class AuthController {
   })
   @ApiCreatedResponse({
     description: 'Successfully Login',
-    type: LoginResponseDto,
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponseDto) },
+        {
+          properties: {
+            data: {
+              $ref: getSchemaPath(LoginResponseDto),
+            },
+          },
+        },
+      ],
+    },
   })
   @ApiBadRequestResponse({
     description: 'Validation Error',
@@ -101,16 +114,13 @@ export class AuthController {
   async login(
     @Req() req: Request,
     @Res() res: Response,
-  ): Promise<Response<LoginResponseDto>> {
+  ): Promise<Response<ApiResponseDto<LoginResponseDto>>> {
     const user = req.user as JWTSignPayload;
     const { access, refresh, exp } = await this.authService.login(user);
 
-    return res.cookie('refresh', refresh, createAuthCookieOpts(exp)).json({
-      status: 'success',
-      data: {
-        access,
-      },
-    });
+    return res
+      .cookie('refresh', refresh, createAuthCookieOpts(exp))
+      .json(new ApiResponseDto<LoginResponseDto>().setData({ access }));
   }
 
   @UseGuards(RefreshJwtGuard)
@@ -120,7 +130,18 @@ export class AuthController {
   @ApiCookieAuth('refresh')
   @ApiCreatedResponse({
     description: 'Successfully Refresh',
-    type: RefreshResponseDto,
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponseDto) },
+        {
+          properties: {
+            data: {
+              $ref: getSchemaPath(RefreshResponseDto),
+            },
+          },
+        },
+      ],
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'Invalid Token or Expired',
@@ -133,7 +154,7 @@ export class AuthController {
   async refresh(
     @Req() req: Request,
     @Res() res: Response,
-  ): Promise<Response<RefreshResponseDto>> {
+  ): Promise<Response<ApiResponseDto<RefreshResponseDto>>> {
     const payload: RefreshReq = {
       refresh: req.cookies['refresh'],
       payload: req.user as JWTSignPayload,
@@ -141,12 +162,9 @@ export class AuthController {
 
     const { access, refresh, exp } = await this.authService.refresh(payload);
 
-    return res.cookie('refresh', refresh, createAuthCookieOpts(exp)).json({
-      status: 'success',
-      data: {
-        access,
-      },
-    });
+    return res
+      .cookie('refresh', refresh, createAuthCookieOpts(exp))
+      .json(new ApiResponseDto<RefreshResponseDto>().setData({ access }));
   }
 
   @UseGuards(RefreshJwtGuard)
