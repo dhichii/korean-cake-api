@@ -20,3 +20,11 @@ export class UserWithPasswordResponseDto {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export class ChangeEmailResponseDto {
+  access: string;
+}
+
+export class ChangeUsernameResponseDto {
+  access: string;
+}
