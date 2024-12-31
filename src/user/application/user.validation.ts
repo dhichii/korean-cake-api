@@ -21,6 +21,11 @@ export class UserValidation {
     .min(3)
     .regex(USERNAME_REGEX, 'username can only be letters and numbers.');
 
+  static readonly EDIT_PROFILE_BY_ID: ZodType = z.object({
+    id: z.string().uuid(),
+    name: z.string().min(1),
+  });
+
   static readonly DELETE_BY_ID: ZodType = z.string().uuid();
 
   static readonly CHANGE_EMAIL: ZodType = z.object({

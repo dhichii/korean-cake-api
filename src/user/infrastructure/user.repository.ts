@@ -7,6 +7,7 @@ import { PrismaService } from '../../common/prisma.service';
 import { UserEntity } from '../domain/user.entity';
 import { IUserRepository } from '../domain/user.repository.interface';
 import { Role } from '@prisma/client';
+import { EditUserProfileDto } from '../interface/http/user.request';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
@@ -42,6 +43,10 @@ export class UserRepository implements IUserRepository {
     }
 
     return data;
+  }
+
+  async editProfileById(id: string, data: EditUserProfileDto): Promise<void> {
+    await this.db.user.update({ where: { id }, data });
   }
 
   async changeEmail(id: string, email: string): Promise<void> {

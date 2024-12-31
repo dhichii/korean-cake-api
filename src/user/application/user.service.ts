@@ -1,6 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IUserRepository } from '../domain/user.repository.interface';
-import { AddUserDto, mapAddUserDto } from '../interface/http/user.request';
+import {
+  AddUserDto,
+  EditUserProfileDto,
+  mapAddUserDto,
+} from '../interface/http/user.request';
 import {
   UserResponseDto,
   UserWithPasswordResponseDto,
@@ -75,6 +79,16 @@ export class UserService implements IUserService {
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
     };
+  }
+
+  async editProfileById(id: string, req: EditUserProfileDto): Promise<void> {
+    this.validationService.validate(UserValidation.EDIT_PROFILE_BY_ID, {
+      id,
+      ...req,
+    });
+
+    await this.userRepository.verify(id);
+    await this.userRepository.editProfileById(id, req);
   }
 
   async deleteById(id: string): Promise<void> {

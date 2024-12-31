@@ -23,3 +23,7 @@ export async function mapAddUserDto(req: AddUserDto): Promise<UserEntity> {
     role: !req.role ? Role.USER : req.role,
   };
 }
+
+export class EditUserProfileDto {
+  name: string;
+}
