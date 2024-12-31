@@ -82,7 +82,7 @@ export class AdminController {
   ): Promise<ApiResponseDto<CreateAdminResponseDto>> {
     const data = await this.adminService.add(req);
 
-    return new ApiResponseDto<CreateAdminResponseDto>().setData(data);
+    return new ApiResponseDto<CreateAdminResponseDto>(data);
   }
 
   @Get()
@@ -118,7 +118,7 @@ export class AdminController {
   async getAll(): Promise<ApiResponseDto<GetAllAdminResponseDto[]>> {
     const data = await this.adminService.getAll();
 
-    return new ApiResponseDto<GetAllAdminResponseDto[]>().setData(data);
+    return new ApiResponseDto<GetAllAdminResponseDto[]>(data);
   }
 
   @Delete(':id')

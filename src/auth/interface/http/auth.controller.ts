@@ -120,7 +120,7 @@ export class AuthController {
 
     return res
       .cookie('refresh', refresh, createAuthCookieOpts(exp))
-      .json(new ApiResponseDto<LoginResponseDto>().setData({ access }));
+      .json(new ApiResponseDto<LoginResponseDto>({ access }));
   }
 
   @UseGuards(RefreshJwtGuard)
@@ -164,7 +164,7 @@ export class AuthController {
 
     return res
       .cookie('refresh', refresh, createAuthCookieOpts(exp))
-      .json(new ApiResponseDto<RefreshResponseDto>().setData({ access }));
+      .json(new ApiResponseDto<RefreshResponseDto>({ access }));
   }
 
   @UseGuards(RefreshJwtGuard)

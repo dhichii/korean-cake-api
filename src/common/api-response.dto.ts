@@ -7,10 +7,8 @@ export class ApiResponseDto<T> {
   @ApiProperty({ description: 'The data returned in the response' })
   data: T;
 
-  setData(data: T): ApiResponseDto<T> {
+  constructor(data: T) {
     this.data = data;
-
-    return this;
   }
 }
 
