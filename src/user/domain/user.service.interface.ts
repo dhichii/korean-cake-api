@@ -1,15 +1,15 @@
 import { Role } from '@prisma/client';
-import { AddUserReq } from '../interface/http/user.request';
+import { AddUserDto } from '../interface/http/user.request';
 import {
-  UserResponse,
-  UserWithPasswordResponse,
+  UserResponseDto,
+  UserWithPasswordResponseDto,
 } from '../interface/http/user.response';
 
 export interface IUserService {
-  add(req: AddUserReq): Promise<{ id: string }>;
-  getAll(role?: Role): Promise<UserResponse[]>;
-  getById(id: string): Promise<UserResponse>;
-  getByUsername(username: string): Promise<UserWithPasswordResponse>;
+  add(req: AddUserDto): Promise<{ id: string }>;
+  getAll(role?: Role): Promise<UserResponseDto[]>;
+  getById(id: string): Promise<UserResponseDto>;
+  getByUsername(username: string): Promise<UserWithPasswordResponseDto>;
   deleteById(id: string): Promise<void>;
   changeEmail(id: string, email: string): Promise<void>;
   changeUsername(id: string, username: string): Promise<void>;

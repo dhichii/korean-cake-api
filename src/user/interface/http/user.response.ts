@@ -1,6 +1,6 @@
 import { Role } from '@prisma/client';
 
-export type UserResponse = {
+export class UserResponseDto {
   id: string;
   name: string;
   username: string;
@@ -8,9 +8,9 @@ export type UserResponse = {
   role: Role;
   createdAt: Date;
   updatedAt: Date;
-};
+}
 
-export type UserWithPasswordResponse = {
+export class UserWithPasswordResponseDto {
   id: string;
   name: string;
   username: string;
@@ -19,4 +19,4 @@ export type UserWithPasswordResponse = {
   password: string;
   createdAt: Date;
   updatedAt: Date;
-};
+}

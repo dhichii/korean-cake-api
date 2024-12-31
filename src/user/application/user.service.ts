@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IUserRepository } from '../domain/user.repository.interface';
-import { AddUserReq, mapAddUserReq } from '../interface/http/user.request';
+import { AddUserDto, mapAddUserDto } from '../interface/http/user.request';
 import {
-  UserResponse,
-  UserWithPasswordResponse,
+  UserResponseDto,
+  UserWithPasswordResponseDto,
 } from '../interface/http/user.response';
 import { IUserService } from '../domain/user.service.interface';
 import { Bcrypt } from '../../utils/Bcrypt';
@@ -18,16 +18,16 @@ export class UserService implements IUserService {
     private validationService: ValidationService,
   ) {}
 
-  async add(req: AddUserReq): Promise<{ id: string }> {
+  async add(req: AddUserDto): Promise<{ id: string }> {
     this.validationService.validate(UserValidation.ADD, req);
 
-    const data = await mapAddUserReq(req);
+    const data = await mapAddUserDto(req);
     const id = await this.userRepository.add(data);
 
     return { id };
   }
 
-  async getAll(role?: Role): Promise<UserResponse[]> {
+  async getAll(role?: Role): Promise<UserResponseDto[]> {
     const res = await this.userRepository.getAll(role);
     const data = res.map((v) => {
       return {
@@ -44,7 +44,7 @@ export class UserService implements IUserService {
     return data;
   }
 
-  async getById(id: string): Promise<UserResponse> {
+  async getById(id: string): Promise<UserResponseDto> {
     this.validationService.validate(UserValidation.GET_BY_ID, id);
 
     const data = await this.userRepository.getById(id);
@@ -60,7 +60,7 @@ export class UserService implements IUserService {
     };
   }
 
-  async getByUsername(username: string): Promise<UserWithPasswordResponse> {
+  async getByUsername(username: string): Promise<UserWithPasswordResponseDto> {
     this.validationService.validate(UserValidation.GET_BY_USERNAME, username);
 
     const data = await this.userRepository.getByUsername(username);
