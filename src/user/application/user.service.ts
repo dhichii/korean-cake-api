@@ -14,12 +14,17 @@ import { Bcrypt } from '../../utils/Bcrypt';
 import { ValidationService } from '../../common/validation.service';
 import { UserValidation } from './user.validation';
 import { Role } from '@prisma/client';
+import { IAuthService } from '../../auth/domain/auth.service.interface';
+import { PrismaService } from '../../common/prisma.service';
+import { TokenResponse } from '../../auth/interface/http/auth.response';
 
 @Injectable()
 export class UserService implements IUserService {
   constructor(
     @Inject('IUserRepository') private userRepository: IUserRepository,
+    @Inject('IAuthService') private authService: IAuthService,
     private validationService: ValidationService,
+    private prismaService: PrismaService,
   ) {}
 
   async add(req: AddUserDto): Promise<{ id: string }> {
@@ -98,21 +103,47 @@ export class UserService implements IUserService {
     await this.userRepository.deleteById(id);
   }
 
-  async changeEmail(id: string, email: string): Promise<void> {
+  async changeEmail(
+    id: string,
+    refreshToken: string,
+    email: string,
+  ): Promise<TokenResponse> {
     this.validationService.validate(UserValidation.CHANGE_EMAIL, { id, email });
 
-    await this.userRepository.verify(id);
-    await this.userRepository.changeEmail(id, email);
+    const user = await this.getById(id);
+
+    let data: TokenResponse;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    await this.prismaService.$transaction(async (tx) => {
+      await this.userRepository.changeEmail(id, email);
+      await this.authService.logout(refreshToken);
+      data = await this.authService.login({ ...user, email });
+    });
+
+    return data;
   }
 
-  async changeUsername(id: string, username: string): Promise<void> {
+  async changeUsername(
+    id: string,
+    refreshToken: string,
+    username: string,
+  ): Promise<TokenResponse> {
     this.validationService.validate(UserValidation.CHANGE_USERNAME, {
       id,
       username,
     });
 
-    await this.userRepository.verify(id);
-    await this.userRepository.changeUsername(id, username);
+    const user = await this.getById(id);
+
+    let data: TokenResponse;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    await this.prismaService.$transaction(async (tx) => {
+      await this.userRepository.changeUsername(id, username);
+      await this.authService.logout(refreshToken);
+      data = await this.authService.login({ ...user, username });
+    });
+
+    return data;
   }
 
   async changePassword(id: string, password: string): Promise<void> {
