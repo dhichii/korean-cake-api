@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { IUserRepository } from '../domain/user.repository.interface';
 import {
   AddUserDto,
@@ -22,7 +22,7 @@ import { TokenResponse } from '../../auth/interface/http/auth.response';
 export class UserService implements IUserService {
   constructor(
     @Inject('IUserRepository') private userRepository: IUserRepository,
-    @Inject('IAuthService') private authService: IAuthService,
+    @Inject(forwardRef(() => 'IAuthService')) private authService: IAuthService,
     private validationService: ValidationService,
     private prismaService: PrismaService,
   ) {}

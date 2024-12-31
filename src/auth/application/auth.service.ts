@@ -1,4 +1,5 @@
 import {
+  forwardRef,
   HttpException,
   Inject,
   Injectable,
@@ -20,7 +21,7 @@ import { AuthValidation } from './auth.validation';
 export class AuthService implements IAuthService {
   constructor(
     @Inject('IAuthRepository') private authRepository: IAuthRepository,
-    @Inject('IUserService') private userService: IUserService,
+    @Inject(forwardRef(() => 'IUserService')) private userService: IUserService,
     private validationService: ValidationService,
     private jwtService: JwtService,
     private prismaService: PrismaService,
