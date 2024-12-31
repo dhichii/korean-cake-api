@@ -47,7 +47,7 @@ export class AdminController {
   @Post()
   @HttpCode(201)
   @UseGuards(JwtGuard, new RolesGuard([Role.SUPER]))
-  @ApiOperation({ summary: 'add new admin' })
+  @ApiOperation({ summary: 'add new admin', description: 'for super only' })
   @ApiBearerAuth('Authorization')
   @ApiCreatedResponse({
     description: 'Successfully add new admin',
@@ -88,7 +88,7 @@ export class AdminController {
   @Get()
   @HttpCode(200)
   @UseGuards(JwtGuard, new RolesGuard([Role.SUPER]))
-  @ApiOperation({ summary: 'get all admin' })
+  @ApiOperation({ summary: 'get all admin', description: 'for super only' })
   @ApiBearerAuth('Authorization')
   @ApiOkResponse({
     description: 'Successfully get all admin',
@@ -124,7 +124,10 @@ export class AdminController {
   @Delete(':id')
   @HttpCode(200)
   @UseGuards(JwtGuard, new RolesGuard([Role.SUPER]))
-  @ApiOperation({ summary: 'delete admin by id' })
+  @ApiOperation({
+    summary: 'delete admin by id',
+    description: 'for super only',
+  })
   @ApiBearerAuth('Authorization')
   @ApiOkResponse({
     description: 'Successfully delete admin',
