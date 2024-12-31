@@ -29,11 +29,11 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 18.x
-      - name: setup and running unit test
+      - name: setup and running test
         run: |
           npm install
           npm run migrate
-          # npm run seed
+          npm run seed
           mkdir public
           npm test
           npm run test:e2e
