@@ -2,6 +2,7 @@ import { Bcrypt } from '../../../utils/Bcrypt';
 import { v4 as uuid } from 'uuid';
 import { UserEntity } from '../../domain/user.entity';
 import { Role } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class AddUserDto {
   name: string;
@@ -25,5 +26,6 @@ export async function mapAddUserDto(req: AddUserDto): Promise<UserEntity> {
 }
 
 export class EditUserProfileDto {
+  @ApiProperty({ example: 'example' })
   name: string;
 }
