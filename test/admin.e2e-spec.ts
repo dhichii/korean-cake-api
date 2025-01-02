@@ -63,7 +63,7 @@ describe('AdminController (e2e)', () => {
   afterAll(async () => {
     await new PrismaClient().user.deleteMany({
       where: {
-        role: Role.ADMIN,
+        id: adminId,
       },
     });
   });
