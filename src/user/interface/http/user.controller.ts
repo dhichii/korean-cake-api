@@ -158,7 +158,7 @@ export class UserController {
   })
   @UseGuards(JwtGuard, new RolesGuard([Role.SUPER, Role.ADMIN]))
   async getAll(): Promise<ApiResponseDto<UserResponseDto[]>> {
-    const data = await this.userService.getAll();
+    const data = await this.userService.getAll(Role.USER);
 
     return new ApiResponseDto(data);
   }
