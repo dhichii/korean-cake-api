@@ -17,7 +17,6 @@ describe('UserController (e2e)', () => {
 
   let userId: string;
   let userAccess: string;
-  let userRefresh: string;
 
   let adminAccess: string;
   let adminRefresh: string;
@@ -63,9 +62,6 @@ describe('UserController (e2e)', () => {
       .send(user);
 
     userAccess = userResponse.body.data.access;
-    userRefresh = userResponse.header['set-cookie'][0]
-      .split(';')[0]
-      .split('refresh=')[1];
 
     const password = await new Bcrypt().hash(admin.password);
     await prismaClient.user.create({
@@ -86,16 +82,8 @@ describe('UserController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await prismaClient.user.deleteMany({
-      where: {
-        username: { in: [user.username, admin.username] },
-      },
-    });
-    await prismaClient.authentication.deleteMany({
-      where: {
-        token: { in: [userRefresh, userAccess] },
-      },
-    });
+    await prismaClient.user.deleteMany();
+    await prismaClient.authentication.deleteMany();
   });
 
   describe('GET /api/v1/users/profile', () => {
