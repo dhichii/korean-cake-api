@@ -35,8 +35,6 @@ async function bootstrap() {
 
   SwaggerModule.setup('docs', app, document);
 
-  console.log(document.paths['/api/v1/admin'].get.parameters);
-
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

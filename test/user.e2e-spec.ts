@@ -261,7 +261,7 @@ describe('UserController (e2e)', () => {
         .set('Authorization', `Bearer ${adminAccess}`)
         .set('Cookie', [`refresh=${adminRefresh}`])
         .send(admin);
-      console.log(response.header['set-cookie']);
+
       const body = response.body;
       const refreshCookie = response.header['set-cookie'][0];
       expect(response.status).toEqual(200);
