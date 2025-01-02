@@ -69,7 +69,7 @@ describe('AdminController (e2e)', () => {
   });
 
   describe('POST /api/v1/admin', () => {
-    it('should return 401 when request credentials forbidden', async () => {
+    it('should return 401 when request credentials invalid', async () => {
       const response = await request(app.getHttpServer()).post('/api/v1/admin');
 
       const errors = response.body.errors;
@@ -87,7 +87,7 @@ describe('AdminController (e2e)', () => {
       expect(errors[0].message).toEqual('Forbidden resource');
     });
 
-    it('should return 400 when request forbidden', async () => {
+    it('should return 400 when request invalid', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/admin')
         .set('Authorization', `Bearer ${validToken}`);
@@ -142,7 +142,7 @@ describe('AdminController (e2e)', () => {
   });
 
   describe('GET /api/v1/admin', () => {
-    it('should return 401 when request credentials forbidden', async () => {
+    it('should return 401 when request credentials invalid', async () => {
       const response = await request(app.getHttpServer()).get('/api/v1/admin');
 
       const errors = response.body.errors;
@@ -178,7 +178,7 @@ describe('AdminController (e2e)', () => {
   });
 
   describe('DELETE /api/v1/admin', () => {
-    it('should return 401 when request credentials forbidden', async () => {
+    it('should return 401 when request credentials invalid', async () => {
       const response = await request(app.getHttpServer()).delete(
         `/api/v1/admin/${adminId}`,
       );
