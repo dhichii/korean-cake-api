@@ -1,4 +1,11 @@
 import { Module } from '@nestjs/common';
+import { MulterModule } from '@nestjs/platform-express';
 
-@Module({})
+@Module({
+  imports: [
+    MulterModule.register({
+      dest: './public',
+    }),
+  ],
+})
 export class OrderModule {}
