@@ -20,10 +20,10 @@ describe('AuthController (e2e)', () => {
   const invalidRefreshToken =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 
-  const req = {
-    name: 'example1',
-    username: 'example1',
-    email: 'example1@gmail.com',
+  const user = {
+    name: 'user auth e2e test',
+    username: 'userauthe2etest',
+    email: 'userauthe2etest@gmail.com',
     password: 'verystrongpassword',
   };
 
@@ -56,32 +56,11 @@ describe('AuthController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     app.use(cookieParser());
     await app.init();
-
-    await request(app.getHttpServer()).post('/api/v1/auth/register').send({
-      name: 'example',
-      username: 'example',
-      email: 'example@gmail.com',
-      password: 'verystrongpassword',
-    });
-    const response = await request(app.getHttpServer())
-      .post('/api/v1/auth/login')
-      .send({
-        username: 'example',
-        password: 'verystrongpassword',
-      });
-
-    refresh = response.header['set-cookie'][0]
-      .split(';')[0]
-      .split('refresh=')[1];
   });
 
   afterAll(async () => {
-    await prismaClient.user.deleteMany({
-      where: { username: { in: ['example', 'example1'] } },
-    });
-    await prismaClient.authentication.deleteMany({
-      where: { token: refresh },
-    });
+    await prismaClient.user.deleteMany();
+    await prismaClient.authentication.deleteMany();
   });
 
   describe('POST /api/v1/auth/register', () => {
@@ -101,7 +80,7 @@ describe('AuthController (e2e)', () => {
     it('should register successfully', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/auth/register')
-        .send(req);
+        .send(user);
 
       expect(response.status).toEqual(201);
       expect(response.body.status).toEqual('success');
@@ -110,7 +89,7 @@ describe('AuthController (e2e)', () => {
     it('should return 400 when username is already exist', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/auth/register')
-        .send(req);
+        .send(user);
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
@@ -118,15 +97,9 @@ describe('AuthController (e2e)', () => {
     });
 
     it('should return 400 when email is already exist', async () => {
-      const req = {
-        name: 'example',
-        username: 'otherexample',
-        email: 'example1@gmail.com',
-        password: 'verystrongpassword',
-      };
       const response = await request(app.getHttpServer())
         .post('/api/v1/auth/register')
-        .send(req);
+        .send({ ...user, username: 'otherusername' });
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
@@ -162,7 +135,7 @@ describe('AuthController (e2e)', () => {
     it('should login successfully', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/auth/login')
-        .send(req);
+        .send(user);
 
       const body = response.body;
       const refreshCookie = response.header['set-cookie'][0];
@@ -172,6 +145,9 @@ describe('AuthController (e2e)', () => {
       expect(refreshCookie).toContain('SameSite=Strict');
       expect(body.status).toEqual('success');
       expect(body.data.access).toBeDefined();
+
+      // asign refresh token
+      refresh = refreshCookie.split(';')[0].split('refresh=')[1];
     });
   });
 
@@ -215,6 +191,7 @@ describe('AuthController (e2e)', () => {
       expect(body.status).toEqual('success');
       expect(body.data.access).toBeDefined();
 
+      // asign new refresh token
       refresh = newRefresh;
     });
   });
