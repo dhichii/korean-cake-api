@@ -29,7 +29,7 @@ export class GdriveService {
       };
 
       const response = await this.drive.files.create({
-        requestBody: { name: file.filename + '.png', parents: [folderId] },
+        requestBody: { name: file.filename, parents: [folderId] },
         media: media,
         fields: 'id',
       });
