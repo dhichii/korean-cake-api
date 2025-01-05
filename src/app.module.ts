@@ -4,10 +4,10 @@ import { AppController } from './app.controller';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
-import { ProgressModule } from './progress/progress.module';
+import { ProcessModule } from './process/process.module';
 
 @Module({
-  imports: [CommonModule, UserModule, AuthModule, AdminModule, ProgressModule],
+  imports: [CommonModule, UserModule, AuthModule, AdminModule, ProcessModule],
   controllers: [AppController],
 })
 export class AppModule {}

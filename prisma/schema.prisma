@@ -66,23 +66,23 @@ model Picture {
   @@map("pictures")
 }
 
-model Progress {
+model Process {
   id String @id @db.VarChar(255)
   name String
   step Int
   orders OrderProgress[]
 
-  @@map("progresses")
+  @@map("processes")
 }
 
 model OrderProgress {
   orderId String
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  progressId String
-  progress Progress @relation(fields: [progressId], references: [id], onDelete: Cascade)
+  processId String
+  process Process @relation(fields: [processId], references: [id], onDelete: Cascade)
   isFinish Boolean
 
-  @@id([orderId, progressId])
+  @@id([orderId, processId])
   @@map("order_progresses")
 }
 
