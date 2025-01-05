@@ -30,7 +30,6 @@ CREATE TABLE "pictures" (
 CREATE TABLE "progresses" (
     "id" VARCHAR(255) NOT NULL,
     "name" TEXT NOT NULL,
-    "isFinish" BOOLEAN NOT NULL,
     "step" INTEGER NOT NULL,
 
     CONSTRAINT "progresses_pkey" PRIMARY KEY ("id")
@@ -40,6 +39,7 @@ CREATE TABLE "progresses" (
 CREATE TABLE "order_progresses" (
     "orderId" TEXT NOT NULL,
     "progressId" TEXT NOT NULL,
+    "isFinish" BOOLEAN NOT NULL,
 
     CONSTRAINT "order_progresses_pkey" PRIMARY KEY ("orderId","progressId")
 );
