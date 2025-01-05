@@ -31,6 +31,7 @@ CREATE TABLE "progresses" (
     "id" VARCHAR(255) NOT NULL,
     "name" TEXT NOT NULL,
     "isFinish" BOOLEAN NOT NULL,
+    "step" INTEGER NOT NULL,
 
     CONSTRAINT "progresses_pkey" PRIMARY KEY ("id")
 );

@@ -70,6 +70,7 @@ model Progress {
   id String @id @db.VarChar(255)
   name String
   isFinish Boolean
+  step Int
   orders OrderProgress[]
 
   @@map("progresses")
