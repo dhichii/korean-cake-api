@@ -49,7 +49,7 @@ export class ProcessService implements IProcessService {
   }
 
   async editSteps(req: EditProcessStepDto[]): Promise<void> {
-    this.validationService.validate(ProcessValidation.EDIT_STEPS, { req });
+    this.validationService.validate(ProcessValidation.EDIT_STEPS, req);
 
     const ids = [];
     const processes = [];
