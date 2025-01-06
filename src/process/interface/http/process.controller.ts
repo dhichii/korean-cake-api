@@ -22,7 +22,7 @@ import {
   UnauthorizedResponse,
   ValidationErrorResponse,
 } from '../../../common/api-response.dto';
-import { IProcessService } from 'src/process/domain/process.service.interface';
+import { IProcessService } from '../../../process/domain/process.service.interface';
 import {
   AddProcessDto,
   EditProcessDto,

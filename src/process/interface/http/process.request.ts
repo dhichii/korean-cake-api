@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ProcessEntity } from 'src/process/domain/process.entity';
+import { ProcessEntity } from '../../../process/domain/process.entity';
 import { v4 as uuid } from 'uuid';
 
 export class AddProcessDto {
