@@ -25,7 +25,7 @@ export function mapAddProcessDto(req: AddProcessDto): ProcessEntity {
   };
 }
 
-export function mapAddEditProcessDto(req: EditProcessDto): ProcessEntity {
+export function mapEditProcessDto(req: EditProcessDto): ProcessEntity {
   return {
     id: req.id,
     name: req.name,
