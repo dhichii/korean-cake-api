@@ -5,5 +5,5 @@ export class AddProcessResponseDto {
 export class GetAllProcessResponseDto {
   id: string;
   name: string;
-  step: string;
+  step: number;
 }
