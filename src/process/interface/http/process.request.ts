@@ -7,7 +7,6 @@ export class AddProcessDto {
 }
 
 export class EditProcessDto {
-  id: string;
   name: string;
   step: number;
 }
@@ -20,14 +19,6 @@ export class EditProcessStepDto {
 export function mapAddProcessDto(req: AddProcessDto): ProcessEntity {
   return {
     id: uuid(),
-    name: req.name,
-    step: req.step,
-  };
-}
-
-export function mapEditProcessDto(req: EditProcessDto): ProcessEntity {
-  return {
-    id: req.id,
     name: req.name,
     step: req.step,
   };
