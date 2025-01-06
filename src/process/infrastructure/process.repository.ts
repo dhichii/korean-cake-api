@@ -32,8 +32,8 @@ export class ProcessRepository implements IProcessRepository {
   }
 
   async verify(id: string): Promise<void> {
-    const result = await this.db.user.count({
-      where: { id, deletedAt: null },
+    const result = await this.db.process.count({
+      where: { id },
     });
     if (!result) {
       throw new NotFoundException('process not found');
