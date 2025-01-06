@@ -2,12 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
 import { ProcessEntity } from '../domain/process.entity';
 import { IProcessRepository } from '../domain/process.repository.interface';
+import { EditProcessDto } from '../interface/http/process.request';
+import { AddProcessResponseDto } from '../interface/http/process.response';
 
 @Injectable()
 export class ProcessRepository implements IProcessRepository {
   constructor(private db: PrismaService) {}
 
-  async add(data: ProcessEntity): Promise<{ id: string }> {
+  async add(data: ProcessEntity): Promise<AddProcessResponseDto> {
     const { id } = await this.db.process.create({ data });
 
     return { id };
@@ -17,7 +19,7 @@ export class ProcessRepository implements IProcessRepository {
     return await this.db.process.findMany({ orderBy: { step: 'asc' } });
   }
 
-  async editById(id: string, data: ProcessEntity): Promise<void> {
+  async editById(id: string, data: EditProcessDto): Promise<void> {
     await this.db.process.update({ where: { id }, data });
   }
 
