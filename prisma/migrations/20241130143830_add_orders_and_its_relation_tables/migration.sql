@@ -39,7 +39,7 @@ CREATE TABLE "processes" (
 CREATE TABLE "order_progresses" (
     "orderId" TEXT NOT NULL,
     "processId" TEXT NOT NULL,
-    "isFinish" BOOLEAN NOT NULL,
+    "isFinish" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "order_progresses_pkey" PRIMARY KEY ("orderId","processId")
 );

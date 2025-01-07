@@ -80,7 +80,7 @@ model OrderProgress {
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
   processId String
   process Process @relation(fields: [processId], references: [id], onDelete: Cascade)
-  isFinish Boolean
+  isFinish Boolean @default(false)
 
   @@id([orderId, processId])
   @@map("order_progresses")
