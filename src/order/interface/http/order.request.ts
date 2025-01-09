@@ -1,4 +1,4 @@
-import { OrderEntity } from 'src/order/domain/order.entity';
+import { EditOrderEntity, OrderEntity } from 'src/order/domain/order.entity';
 import { v4 as uuid } from 'uuid';
 
 export class AddOrderDto {
@@ -61,3 +61,17 @@ export class EditOrderDto {
   addedProgresses: string[];
   deletedProgresses: string[];
 }
+
+export const mapEditOrderDto = (req: EditOrderDto): EditOrderEntity => ({
+  size: req.size,
+  layer: req.layer,
+  isUseTopper: req.isUseTopper,
+  pickupTime: req.pickupTime,
+  text: req.text,
+  textColor: req.textColor,
+  price: req.price,
+  downPayment: req.downPayment,
+  remainingPayment: req.remainingPayment,
+  telp: req.telp,
+  notes: req.notes,
+});

@@ -13,3 +13,17 @@ export type OrderEntity = {
   text: string;
   textColor: string;
 };
+
+export type EditOrderEntity = {
+  size: number;
+  layer?: number;
+  isUseTopper: boolean;
+  pickupTime: number;
+  price: number;
+  downPayment: number;
+  remainingPayment: number;
+  telp: string;
+  notes?: string;
+  text: string;
+  textColor: string;
+};
