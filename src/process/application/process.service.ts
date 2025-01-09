@@ -72,4 +72,8 @@ export class ProcessService implements IProcessService {
     await this.processRepository.verify(id);
     await this.processRepository.deleteById(id);
   }
+
+  async verifyAll(ids: string[]): Promise<void> {
+    await this.processRepository.verifyAll(ids);
+  }
 }

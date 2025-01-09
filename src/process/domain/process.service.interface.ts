@@ -14,4 +14,5 @@ export interface IProcessService {
   editById(id: string, req: EditProcessDto): Promise<void>;
   editSteps(req: EditProcessStepDto[]): Promise<void>;
   deleteById(id: string): Promise<void>;
+  verifyAll(ids: string[]): Promise<void>;
 }
