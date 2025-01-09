@@ -40,6 +40,7 @@ export class OrderPictureDto {
 }
 
 export class GetAllOrderDto {
+  userId: string;
   limit: number;
   page: number;
 }
