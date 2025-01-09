@@ -58,6 +58,7 @@ export class EditOrderDto {
   remainingPayment: number;
   telp: string;
   notes?: string;
+  addedPictures: Express.Multer.File[];
   deletedPictures: string[];
   addedProgresses: string[];
   deletedProgresses: string[];
