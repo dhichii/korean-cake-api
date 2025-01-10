@@ -5,7 +5,7 @@ export class AddOrderDto {
   size: number;
   layer?: number;
   isUseTopper: boolean;
-  pickupTime: number;
+  pickupTime: bigint;
   text: string;
   textColor: string;
   price: number;
@@ -50,7 +50,7 @@ export class EditOrderDto {
   size: number;
   layer?: number;
   isUseTopper: boolean;
-  pickupTime: number;
+  pickupTime: bigint;
   text: string;
   textColor: string;
   price: number;

@@ -13,7 +13,7 @@ export class GetAllOrderResponseDto {
   size: number;
   layer?: number;
   isUseTopper: boolean;
-  pickupTime: number;
+  pickupTime: bigint;
   text: string;
   textColor: string;
   price: number;
@@ -30,7 +30,7 @@ export class GetOrderByIdResponseDto {
   size: number;
   layer?: number;
   isUseTopper: boolean;
-  pickupTime: number;
+  pickupTime: bigint;
   text: string;
   textColor: string;
   price: number;

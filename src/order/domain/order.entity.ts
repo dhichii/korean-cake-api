@@ -4,7 +4,7 @@ export type OrderEntity = {
   size: number;
   layer?: number;
   isUseTopper: boolean;
-  pickupTime: number;
+  pickupTime: bigint;
   price: number;
   downPayment: number;
   remainingPayment: number;
@@ -18,7 +18,7 @@ export type EditOrderEntity = {
   size: number;
   layer?: number;
   isUseTopper: boolean;
-  pickupTime: number;
+  pickupTime: bigint;
   price: number;
   downPayment: number;
   remainingPayment: number;
