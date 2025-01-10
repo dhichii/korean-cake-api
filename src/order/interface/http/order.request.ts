@@ -77,3 +77,7 @@ export const mapEditOrderDto = (req: EditOrderDto): EditOrderEntity => ({
   telp: req.telp,
   notes: req.notes,
 });
+
+export class EditOrderProgressDto {
+  isFinish: boolean;
+}
