@@ -22,7 +22,8 @@ metadata: "{
   "downPayment": 100000,
   "remainingPayment": 100000,
   "telp": "6289898888",
-  "notes": null
+  "notes": null,
+  "progresses": ["e6314752-c753-47dc-bc82-eae480d1b094"]
 }"
 ```
 

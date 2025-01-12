@@ -1,4 +1,7 @@
-import { EditOrderEntity, OrderEntity } from 'src/order/domain/order.entity';
+import {
+  EditOrderEntity,
+  OrderEntity,
+} from '../../../order/domain/order.entity';
 import { v4 as uuid } from 'uuid';
 
 export class AddOrderDto {
