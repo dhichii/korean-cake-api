@@ -61,10 +61,10 @@ describe('ProcessController (e2e)', () => {
     await prismaClient.user.deleteMany();
   });
 
-  describe('POST /api/v1/process', () => {
+  describe('POST /api/v1/processes', () => {
     it('should return 401 when request credentials invalid', async () => {
       const response = await request(app.getHttpServer()).post(
-        '/api/v1/process',
+        '/api/v1/processes',
       );
 
       const errors = response.body.errors;
@@ -74,7 +74,7 @@ describe('ProcessController (e2e)', () => {
 
     it('should return 400 when request invalid', async () => {
       const response = await request(app.getHttpServer())
-        .post('/api/v1/process')
+        .post('/api/v1/processes')
         .set('Authorization', `Bearer ${accessToken}`);
 
       const errors = response.body.errors;
@@ -85,7 +85,7 @@ describe('ProcessController (e2e)', () => {
 
     it('should add new process successfully', async () => {
       const response = await request(app.getHttpServer())
-        .post('/api/v1/process')
+        .post('/api/v1/processes')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(req);
 
@@ -98,10 +98,10 @@ describe('ProcessController (e2e)', () => {
     });
   });
 
-  describe('GET /api/v1/process', () => {
+  describe('GET /api/v1/processes', () => {
     it('should return 401 when request credentials invalid', async () => {
       const response = await request(app.getHttpServer()).get(
-        '/api/v1/process',
+        '/api/v1/processes',
       );
 
       const errors = response.body.errors;
@@ -111,7 +111,7 @@ describe('ProcessController (e2e)', () => {
 
     it('should get all processes successfully', async () => {
       const response = await request(app.getHttpServer())
-        .get('/api/v1/process')
+        .get('/api/v1/processes')
         .set('Authorization', `Bearer ${accessToken}`);
 
       const body = response.body;
@@ -125,10 +125,10 @@ describe('ProcessController (e2e)', () => {
     });
   });
 
-  describe('PUT /api/v1/process/{id}', () => {
+  describe('PUT /api/v1/processes/{id}', () => {
     it('should return 401 when request credentials invalid', async () => {
       const response = await request(app.getHttpServer()).put(
-        `/api/v1/process/${processId}`,
+        `/api/v1/processes/${processId}`,
       );
 
       const errors = response.body.errors;
@@ -138,7 +138,7 @@ describe('ProcessController (e2e)', () => {
 
     it('should return 400 when request invalid', async () => {
       const response = await request(app.getHttpServer())
-        .put(`/api/v1/process/${processId}`)
+        .put(`/api/v1/processes/${processId}`)
         .set('Authorization', `Bearer ${accessToken}`);
 
       const errors = response.body.errors;
@@ -149,7 +149,7 @@ describe('ProcessController (e2e)', () => {
 
     it('should edit process successfully', async () => {
       const response = await request(app.getHttpServer())
-        .put(`/api/v1/process/${processId}`)
+        .put(`/api/v1/processes/${processId}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send(req);
 
@@ -158,10 +158,10 @@ describe('ProcessController (e2e)', () => {
     });
   });
 
-  describe('PUT /api/v1/process/steps', () => {
+  describe('PUT /api/v1/processes/steps', () => {
     it('should return 401 when request credentials invalid', async () => {
       const response = await request(app.getHttpServer()).patch(
-        '/api/v1/process/steps',
+        '/api/v1/processes/steps',
       );
 
       const errors = response.body.errors;
@@ -171,7 +171,7 @@ describe('ProcessController (e2e)', () => {
 
     it('should return 400 when request invalid', async () => {
       const response = await request(app.getHttpServer())
-        .patch('/api/v1/process/steps')
+        .patch('/api/v1/processes/steps')
         .set('Authorization', `Bearer ${accessToken}`);
 
       const errors = response.body.errors;
@@ -181,7 +181,7 @@ describe('ProcessController (e2e)', () => {
 
     it('should edit process steps successfully', async () => {
       const response = await request(app.getHttpServer())
-        .patch('/api/v1/process/steps')
+        .patch('/api/v1/processes/steps')
         .set('Authorization', `Bearer ${accessToken}`)
         .send([{ id: processId, step: req.step }]);
 
@@ -190,10 +190,10 @@ describe('ProcessController (e2e)', () => {
     });
   });
 
-  describe('DELETE /api/v1/process/{id}', () => {
+  describe('DELETE /api/v1/processes/{id}', () => {
     it('should return 401 when request credentials invalid', async () => {
       const response = await request(app.getHttpServer()).delete(
-        `/api/v1/process/${processId}`,
+        `/api/v1/processes/${processId}`,
       );
 
       const errors = response.body.errors;
@@ -203,7 +203,7 @@ describe('ProcessController (e2e)', () => {
 
     it('should delete process successfully', async () => {
       const response = await request(app.getHttpServer())
-        .delete(`/api/v1/process/${processId}`)
+        .delete(`/api/v1/processes/${processId}`)
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(response.status).toEqual(200);

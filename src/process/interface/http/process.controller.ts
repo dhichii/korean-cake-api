@@ -45,7 +45,7 @@ import {
 } from '@nestjs/swagger';
 import { User } from '../../../common/decorator/user.decorator';
 
-@Controller('/api/v1/process')
+@Controller('/api/v1/processes')
 @UseGuards(JwtGuard)
 @ApiExtraModels(ApiResponseDto, AddProcessResponseDto, GetAllProcessResponseDto)
 export class ProcessController {
