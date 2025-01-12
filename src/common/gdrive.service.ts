@@ -37,9 +37,6 @@ export class GdriveService {
       return response.data;
     } catch (e) {
       throw new Error(e);
-    } finally {
-      // remove the local file
-      fs.promises.unlink(file.path);
     }
   }
 
