@@ -9,10 +9,10 @@ import {
 } from '../interface/http/process.response';
 
 export interface IProcessService {
-  add(req: AddProcessDto): Promise<AddProcessResponseDto>;
-  getAll(): Promise<GetAllProcessResponseDto[]>;
-  editById(id: string, req: EditProcessDto): Promise<void>;
-  editSteps(req: EditProcessStepDto[]): Promise<void>;
-  deleteById(id: string): Promise<void>;
-  verifyAll(ids: string[]): Promise<void>;
+  add(userId: string, req: AddProcessDto): Promise<AddProcessResponseDto>;
+  getAll(userId: string): Promise<GetAllProcessResponseDto[]>;
+  editById(id: string, userId: string, req: EditProcessDto): Promise<void>;
+  editSteps(userId: string, req: EditProcessStepDto[]): Promise<void>;
+  deleteById(id: string, userId: string): Promise<void>;
+  verifyAll(ids: string[], userId: string): Promise<void>;
 }

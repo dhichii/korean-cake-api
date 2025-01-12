@@ -11,9 +11,7 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { Role } from '@prisma/client';
 import { JwtGuard } from '../../../auth/guards/jwt.guard';
-import { RolesGuard } from '../../../common/roles.guard';
 import {
   ApiResponseDto,
   ForbiddenResponse,
@@ -45,9 +43,10 @@ import {
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { User } from '../../../common/decorator/user.decorator';
 
 @Controller('/api/v1/process')
-@UseGuards(JwtGuard, new RolesGuard([Role.SUPER, Role.ADMIN]))
+@UseGuards(JwtGuard)
 @ApiExtraModels(ApiResponseDto, AddProcessResponseDto, GetAllProcessResponseDto)
 export class ProcessController {
   constructor(
@@ -58,7 +57,6 @@ export class ProcessController {
   @HttpCode(201)
   @ApiOperation({
     summary: 'add new process',
-    description: 'for super/admin only',
   })
   @ApiBearerAuth('Authorization')
   @ApiCreatedResponse({
@@ -90,9 +88,10 @@ export class ProcessController {
     type: InternalServerResponse,
   })
   async add(
+    @User('id') userId: string,
     @Body() req: AddProcessDto,
   ): Promise<ApiResponseDto<AddProcessResponseDto>> {
-    const data = await this.processService.add(req);
+    const data = await this.processService.add(userId, req);
 
     return new ApiResponseDto<AddProcessResponseDto>(data);
   }
@@ -101,7 +100,6 @@ export class ProcessController {
   @HttpCode(200)
   @ApiOperation({
     summary: 'get all processes',
-    description: 'for super/admin only',
   })
   @ApiBearerAuth('Authorization')
   @ApiOkResponse({
@@ -129,8 +127,10 @@ export class ProcessController {
     description: 'Internal Server Error',
     type: InternalServerResponse,
   })
-  async getAll(): Promise<ApiResponseDto<GetAllProcessResponseDto[]>> {
-    const data = await this.processService.getAll();
+  async getAll(
+    @User('id') userId: string,
+  ): Promise<ApiResponseDto<GetAllProcessResponseDto[]>> {
+    const data = await this.processService.getAll(userId);
 
     return new ApiResponseDto<GetAllProcessResponseDto[]>(data);
   }
@@ -139,7 +139,6 @@ export class ProcessController {
   @HttpCode(200)
   @ApiOperation({
     summary: 'edit process by id',
-    description: 'for super/admin only',
   })
   @ApiBearerAuth('Authorization')
   @ApiOkResponse({
@@ -161,9 +160,10 @@ export class ProcessController {
   })
   async editById(
     @Param('id') id: string,
+    @User('id') userId: string,
     @Body() req: EditProcessDto,
   ): Promise<StatusResponseDto> {
-    await this.processService.editById(id, req);
+    await this.processService.editById(id, userId, req);
 
     return new StatusResponseDto();
   }
@@ -172,7 +172,6 @@ export class ProcessController {
   @HttpCode(200)
   @ApiOperation({
     summary: 'edit process steps',
-    description: 'for super/admin only',
   })
   @ApiBearerAuth('Authorization')
   @ApiBody({ type: [EditProcessStepDto] })
@@ -194,9 +193,10 @@ export class ProcessController {
     type: InternalServerResponse,
   })
   async editSteps(
+    @User('id') userId: string,
     @Body() req: EditProcessStepDto[],
   ): Promise<StatusResponseDto> {
-    await this.processService.editSteps(req);
+    await this.processService.editSteps(userId, req);
 
     return new StatusResponseDto();
   }
@@ -205,7 +205,6 @@ export class ProcessController {
   @HttpCode(200)
   @ApiOperation({
     summary: 'delete process by id',
-    description: 'for super/admin only',
   })
   @ApiBearerAuth('Authorization')
   @ApiOkResponse({
@@ -225,8 +224,11 @@ export class ProcessController {
     description: 'Internal Server Error',
     type: InternalServerResponse,
   })
-  async deleteById(@Param('id') id: string): Promise<StatusResponseDto> {
-    await this.processService.deleteById(id);
+  async deleteById(
+    @Param('id') id: string,
+    @User('id') userId: string,
+  ): Promise<StatusResponseDto> {
+    await this.processService.deleteById(id, userId);
 
     return new StatusResponseDto();
   }

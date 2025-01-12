@@ -26,9 +26,13 @@ export class EditProcessStepDto {
   step: number;
 }
 
-export function mapAddProcessDto(req: AddProcessDto): ProcessEntity {
+export function mapAddProcessDto(
+  userId: string,
+  req: AddProcessDto,
+): ProcessEntity {
   return {
     id: uuid(),
+    userId,
     name: req.name,
     step: req.step,
   };
