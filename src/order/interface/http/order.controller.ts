@@ -5,6 +5,7 @@ import {
   Get,
   Inject,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -133,8 +134,8 @@ export class OrderController {
     type: InternalServerResponse,
   })
   async getAll(
-    @Query('limit') limit: number,
-    @Query('page') page: number,
+    @Query('limit', ParseIntPipe) limit: number,
+    @Query('page', ParseIntPipe) page: number,
     @User('id') userId: string,
   ): Promise<PaginationResponseDto<GetAllOrderResponseDto[]>> {
     limit = limit || 10;
