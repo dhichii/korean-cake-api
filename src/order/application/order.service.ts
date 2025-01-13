@@ -65,8 +65,10 @@ export class OrderService implements IOrderService {
       throw e;
     } finally {
       // remove the local file
-      for (const picture of req.pictures) {
-        fs.promises.unlink(picture.path);
+      if (Array.isArray(req.pictures)) {
+        for (const picture of req.pictures) {
+          fs.promises.unlink(picture.path);
+        }
       }
     }
   }
@@ -87,6 +89,10 @@ export class OrderService implements IOrderService {
     const newPictures: OrderPictureDto[] = [];
     try {
       req = this.validationService.validate(OrderValidation.EDIT_BY_ID, req);
+      if (!Array.isArray(req.addedPictures)) {
+        req.addedPictures = [];
+      }
+
       // verify order and order progresses
       await this.orderRepository.verify(id, userId);
       await this.processService.verifyAll(req.addedProgresses, userId);
