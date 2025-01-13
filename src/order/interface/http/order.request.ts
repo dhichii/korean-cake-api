@@ -5,6 +5,7 @@ import {
 import { v4 as uuid } from 'uuid';
 
 export class AddOrderDto {
+  pictures: Express.Multer.File[];
   size: number;
   layer?: number;
   isUseTopper: boolean;

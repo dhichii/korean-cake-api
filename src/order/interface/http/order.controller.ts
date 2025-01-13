@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -47,15 +46,9 @@ export class OrderController {
     @User('id') userId: string,
     @Body() body: AddOrderDto,
   ): Promise<ApiResponseDto<AddOrderResponseDto>> {
-    const pictures = files['pictures'];
-    if (!pictures || pictures.length < 1) {
-      throw new BadRequestException({
-        path: ['pictures'],
-        message: 'Required',
-      });
-    }
+    body.pictures = files['pictures'];
 
-    const data = await this.orderService.add(body, userId, pictures);
+    const data = await this.orderService.add(body, userId);
 
     return new ApiResponseDto(data);
   }
@@ -104,15 +97,8 @@ export class OrderController {
     @User('id') userId: string,
     @Body() body: EditOrderDto,
   ): Promise<StatusResponseDto> {
-    const addedPictures = files['addedPictures'];
-    if (!addedPictures || addedPictures.length < 1) {
-      throw new BadRequestException({
-        path: ['pictures'],
-        message: 'Required',
-      });
-    }
+    body.addedPictures = files['addedPictures'];
 
-    body.addedPictures = addedPictures;
     const data = await this.orderService.editById(id, userId, body);
 
     return new ApiResponseDto(data);

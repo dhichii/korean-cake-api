@@ -32,11 +32,7 @@ export class OrderService implements IOrderService {
     private prismaService: PrismaService,
   ) {}
 
-  async add(
-    req: AddOrderDto,
-    userId: string,
-    pictures: Express.Multer.File[],
-  ): Promise<AddOrderResponseDto> {
+  async add(req: AddOrderDto, userId: string): Promise<AddOrderResponseDto> {
     const orderPictures: OrderPictureDto[] = [];
     try {
       req = this.validationService.validate(OrderValidation.ADD, req);
@@ -44,7 +40,7 @@ export class OrderService implements IOrderService {
       // verify order progresses
       await this.processService.verifyAll(req.progresses, userId);
       // upload and mapping pictures
-      for (const picture of pictures) {
+      for (const picture of req.pictures) {
         const response = await this.gdriveService.upload(
           picture,
           process.env.GDRIVE_ORDER_FOLDER_ID,
@@ -69,7 +65,7 @@ export class OrderService implements IOrderService {
       throw e;
     } finally {
       // remove the local file
-      for (const picture of pictures) {
+      for (const picture of req.pictures) {
         fs.promises.unlink(picture.path);
       }
     }
@@ -88,11 +84,9 @@ export class OrderService implements IOrderService {
   }
 
   async editById(id: string, userId: string, req: EditOrderDto): Promise<void> {
-    req = this.validationService.validate(OrderValidation.EDIT_BY_ID, req);
-    console.log(req);
-
     const newPictures: OrderPictureDto[] = [];
     try {
+      req = this.validationService.validate(OrderValidation.EDIT_BY_ID, req);
       // verify order and order progresses
       await this.orderRepository.verify(id, userId);
       await this.processService.verifyAll(req.addedProgresses, userId);

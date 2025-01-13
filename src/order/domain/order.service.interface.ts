@@ -11,11 +11,7 @@ import {
 } from '../interface/http/order.response';
 
 export interface IOrderService {
-  add(
-    req: AddOrderDto,
-    userId: string,
-    pictures: Express.Multer.File[],
-  ): Promise<AddOrderResponseDto>;
+  add(req: AddOrderDto, userId: string): Promise<AddOrderResponseDto>;
   getAll(req: GetAllOrderDto): Promise<[number, GetAllOrderResponseDto[]]>;
   getById(id: string, userId: string): Promise<GetOrderByIdResponseDto>;
   editById(id: string, userId: string, req: EditOrderDto): Promise<void>;

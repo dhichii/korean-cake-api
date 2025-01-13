@@ -3,6 +3,7 @@ import { z, ZodType } from 'zod';
 
 export class OrderValidation {
   static readonly ADD: ZodType = z.object({
+    pictures: z.array(z.any()).nonempty(),
     size: z.preprocess((v: string) => parseInt(v), z.number().min(10)),
     layer: z.preprocess(
       (v: string) => parseInt(v) || null,
@@ -67,7 +68,7 @@ export class OrderValidation {
       if (typeof v === 'string') return [v];
       return [];
     }, z.array(z.string().uuid().optional())),
-    addedPictures: z.array(z.any().optional()),
+    addedPictures: z.array(z.any()).optional(),
   });
 
   static readonly DELETE_BY_ID: ZodType = z.object({
