@@ -17,9 +17,12 @@ import { JwtGuard } from '../../../auth/guards/jwt.guard';
 import { IOrderService } from '../../../order/domain/order.service.interface';
 import {
   ApiResponseDto,
+  InternalServerResponse,
   PaginationPayload,
   PaginationResponseDto,
   StatusResponseDto,
+  UnauthorizedResponse,
+  ValidationErrorResponse,
 } from '../../../common/api-response.dto';
 import {
   AddOrderResponseDto,
@@ -33,14 +36,63 @@ import {
   GetAllOrderDto,
 } from './order.request';
 import { User } from '../../../common/decorator/user.decorator';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiExtraModels,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiUnauthorizedResponse,
+  getSchemaPath,
+} from '@nestjs/swagger';
 
 @Controller('/api/v1/orders')
 @UseGuards(JwtGuard)
+@ApiExtraModels(
+  ApiResponseDto,
+  AddOrderResponseDto,
+  PaginationResponseDto,
+  GetAllOrderResponseDto,
+  GetOrderByIdResponseDto,
+)
 export class OrderController {
   constructor(@Inject('IOrderService') private orderService: IOrderService) {}
 
   @Post()
   @UseInterceptors(FileFieldsInterceptor([{ name: 'pictures', maxCount: 3 }]))
+  @ApiOperation({ summary: 'add new order' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBearerAuth('Authorization')
+  @ApiCreatedResponse({
+    description: 'Successfully add new order',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponseDto) },
+        {
+          properties: {
+            data: {
+              $ref: getSchemaPath(AddOrderResponseDto),
+            },
+          },
+        },
+      ],
+    },
+  })
+  @ApiBadRequestResponse({
+    description: 'Validation Error',
+    type: ValidationErrorResponse,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid Token or Expired',
+    type: UnauthorizedResponse,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+    type: InternalServerResponse,
+  })
   async add(
     @UploadedFiles() files,
     @User('id') userId: string,
@@ -54,6 +106,32 @@ export class OrderController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'get all orders' })
+  @ApiBearerAuth('Authorization')
+  @ApiOkResponse({
+    description: 'Successfully get all orders',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(PaginationResponseDto) },
+        {
+          properties: {
+            data: {
+              type: 'array',
+              items: { $ref: getSchemaPath(GetAllOrderResponseDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid Token or Expired',
+    type: UnauthorizedResponse,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+    type: InternalServerResponse,
+  })
   async getAll(
     @Query('limit') limit: number,
     @Query('page') page: number,
@@ -78,6 +156,29 @@ export class OrderController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'get order by id' })
+  @ApiBearerAuth('Authorization')
+  @ApiOkResponse({
+    description: 'Successfully order by id',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponseDto) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(GetOrderByIdResponseDto) },
+          },
+        },
+      ],
+    },
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid Token or Expired',
+    type: UnauthorizedResponse,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+    type: InternalServerResponse,
+  })
   async getById(
     @Param('id') id: string,
     @User('id') userId: string,
@@ -91,6 +192,25 @@ export class OrderController {
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'addedPictures', maxCount: 3 }]),
   )
+  @ApiOperation({ summary: 'edit order by id' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBearerAuth('Authorization')
+  @ApiOkResponse({
+    description: 'Successfully edit order by id',
+    type: StatusResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Validation Error',
+    type: ValidationErrorResponse,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid Token or Expired',
+    type: UnauthorizedResponse,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+    type: InternalServerResponse,
+  })
   async editById(
     @Param('id') id: string,
     @UploadedFiles() files,
@@ -105,6 +225,24 @@ export class OrderController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'delete order by id' })
+  @ApiBearerAuth('Authorization')
+  @ApiOkResponse({
+    description: 'Successfully delete order by id',
+    type: StatusResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Validation Error',
+    type: ValidationErrorResponse,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid Token or Expired',
+    type: UnauthorizedResponse,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+    type: InternalServerResponse,
+  })
   async deleteById(
     @Param('id') id: string,
     @User('id') userId: string,
@@ -115,6 +253,25 @@ export class OrderController {
   }
 
   @Put(':id/progresses/:progressId')
+  @ApiOperation({ summary: 'edit order progress by id' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBearerAuth('Authorization')
+  @ApiOkResponse({
+    description: 'Successfully edit order progress by id',
+    type: StatusResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Validation Error',
+    type: ValidationErrorResponse,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid Token or Expired',
+    type: UnauthorizedResponse,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+    type: InternalServerResponse,
+  })
   async editProgressById(
     @Param('id') orderId: string,
     @Param('progressId') progressId: string,
