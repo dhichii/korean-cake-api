@@ -135,7 +135,15 @@ export class OrderService implements IOrderService {
           newPictures,
         );
         for (const pictureId of req.deletedPictures) {
-          await this.gdriveService.delete(pictureId);
+          try {
+            await this.gdriveService.delete(pictureId);
+          } catch (e) {
+            if (e.message.includes('File not found')) {
+              continue;
+            }
+
+            throw e;
+          }
         }
       });
     } catch (e) {
