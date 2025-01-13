@@ -15,10 +15,6 @@ export class OrderValidation {
     textColor: z.string(),
     price: z.preprocess((v: string) => parseFloat(v), z.number().min(0)),
     downPayment: z.preprocess((v: string) => parseFloat(v), z.number().min(0)),
-    remainingPayment: z.preprocess(
-      (v: string) => parseFloat(v),
-      z.number().min(0),
-    ),
     telp: z.string().regex(NUMBER_REGEX, 'should contains only number'),
     notes: z.string().optional(),
     progresses: z.preprocess(
@@ -44,10 +40,6 @@ export class OrderValidation {
     textColor: z.string(),
     price: z.preprocess((v: string) => parseFloat(v), z.number().min(0)),
     downPayment: z.preprocess((v: string) => parseFloat(v), z.number().min(0)),
-    remainingPayment: z.preprocess(
-      (v: string) => parseFloat(v),
-      z.number().min(0),
-    ),
     telp: z.string().regex(NUMBER_REGEX, 'should contains only number'),
     notes: z.string().optional(),
     deletedPictures: z.preprocess(

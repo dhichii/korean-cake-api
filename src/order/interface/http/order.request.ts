@@ -39,9 +39,6 @@ export class AddOrderDto {
   @ApiProperty({ format: 'double', example: 20000 })
   downPayment: number;
 
-  @ApiProperty({ format: 'double', example: 20000 })
-  remainingPayment: number;
-
   @ApiProperty({ example: '6289898888' })
   telp: string;
 
@@ -66,7 +63,7 @@ export const mapAddOrderDto = (
   textColor: req.textColor,
   price: req.price,
   downPayment: req.downPayment,
-  remainingPayment: req.remainingPayment,
+  remainingPayment: req.price - req.downPayment,
   telp: req.telp,
   notes: req.notes,
 });
@@ -107,9 +104,6 @@ export class EditOrderDto {
   @ApiProperty({ format: 'double', example: 20000 })
   downPayment: number;
 
-  @ApiProperty({ format: 'double', example: 20000 })
-  remainingPayment: number;
-
   @ApiProperty({ example: '6289898888' })
   telp: string;
 
@@ -145,7 +139,7 @@ export const mapEditOrderDto = (req: EditOrderDto): EditOrderEntity => ({
   textColor: req.textColor,
   price: req.price,
   downPayment: req.downPayment,
-  remainingPayment: req.remainingPayment,
+  remainingPayment: req.price - req.downPayment,
   telp: req.telp,
   notes: req.notes,
 });
