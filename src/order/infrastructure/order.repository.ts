@@ -131,12 +131,13 @@ export class OrderRepository implements IOrderRepository {
     });
 
     return {
-      ...res,
-      pickupTime: res.pickupTime.toString(),
+      id: res.id,
       status:
         inprogressProcessesCount != 0
           ? OrderStatus.COMPLETED
           : OrderStatus.INPROGRESS,
+      ...res,
+      pickupTime: res.pickupTime.toString(),
       pictures: res.pictures,
       progresses,
     };
