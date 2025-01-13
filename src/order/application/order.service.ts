@@ -39,7 +39,7 @@ export class OrderService implements IOrderService {
   ): Promise<AddOrderResponseDto> {
     const orderPictures: OrderPictureDto[] = [];
     try {
-      this.validationService.validate(OrderValidation.ADD, req);
+      req = this.validationService.validate(OrderValidation.ADD, req);
 
       // verify order progresses
       await this.processService.verifyAll(req.progresses, userId);
@@ -88,7 +88,8 @@ export class OrderService implements IOrderService {
   }
 
   async editById(id: string, userId: string, req: EditOrderDto): Promise<void> {
-    this.validationService.validate(OrderValidation.EDIT_BY_ID, req);
+    req = this.validationService.validate(OrderValidation.EDIT_BY_ID, req);
+    console.log(req);
 
     const newPictures: OrderPictureDto[] = [];
     try {
@@ -152,7 +153,10 @@ export class OrderService implements IOrderService {
     userId: string,
     req: EditOrderProgressDto,
   ): Promise<void> {
-    this.validationService.validate(OrderValidation.EDIT_PROGRESS_BY_ID, req);
+    req = this.validationService.validate(
+      OrderValidation.EDIT_PROGRESS_BY_ID,
+      req,
+    );
 
     // verify the order with userId
     await this.orderRepository.verify(orderId, userId);
