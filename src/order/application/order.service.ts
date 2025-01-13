@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { GdriveService } from '../../common/gdrive.service';
 import { IOrderService } from '../domain/order.service.interface';
 import {
@@ -96,6 +96,21 @@ export class OrderService implements IOrderService {
       // verify order and order progresses
       await this.orderRepository.verify(id, userId);
       await this.processService.verifyAll(req.addedProgresses, userId);
+
+      // verify if processes already exist. if exist, remove from request
+      for (const [index, progressId] of req.addedProgresses.entries()) {
+        try {
+          await this.orderRepository.verifyProgress(progressId, id);
+
+          req.addedProgresses.splice(index, 1);
+        } catch (e) {
+          if (e instanceof NotFoundException) {
+            continue;
+          }
+
+          throw e;
+        }
+      }
 
       // upload and mapping pictures
       for (const picture of req.addedPictures) {
