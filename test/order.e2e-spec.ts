@@ -132,6 +132,7 @@ describe('OrderController (e2e)', () => {
     it('should return 400 when request invalid', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/orders')
+        .set('Content-Type', 'multipart/form-data')
         .set('Authorization', `Bearer ${accessToken}`);
 
       const errors = response.body.errors;
