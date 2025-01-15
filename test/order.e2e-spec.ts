@@ -132,8 +132,8 @@ describe('OrderController (e2e)', () => {
     it('should return 400 when request invalid', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/orders')
-        .set('Content-Type', 'multipart/form-data')
-        .set('Authorization', `Bearer ${accessToken}`);
+        .set('Authorization', `Bearer ${accessToken}`)
+        .field({ notes: req.notes });
 
       const errors = response.body.errors;
       expect(response).toEqual('wow');
@@ -154,18 +154,7 @@ describe('OrderController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/orders')
         .set('Authorization', `Bearer ${accessToken}`)
-        .field('size', req.size)
-        .field('layer', req.layer)
-        .field('isUseTopper', req.isUseTopper)
-        .field('pickupTime', req.pickupTime)
-        .field('text', req.text)
-        .field('textColor', req.textColor)
-        .field('price', req.price)
-        .field('downPayment', req.downPayment)
-        .field('telp', req.telp)
-        .field('notes', req.notes)
-        .field('progresses', req.progresses[0])
-        .field('progresses', req.progresses[1])
+        .field(req)
         .attach('pictures', './test/logo.png')
         .attach('pictures', './test/logo.png');
 
