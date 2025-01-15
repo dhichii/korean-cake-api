@@ -136,7 +136,6 @@ describe('OrderController (e2e)', () => {
         .field({ notes: req.notes });
 
       const errors = response.body.errors;
-      expect(response).toEqual('wow');
       expect(response.status).toEqual(400);
       expect(errors[0].path[0]).toEqual('pictures');
       expect(errors[1].path[0]).toEqual('size');
@@ -150,7 +149,7 @@ describe('OrderController (e2e)', () => {
       expect(errors[9].path[0]).toEqual('progresses');
     });
 
-    it('should add new process successfully', async () => {
+    it('should add new order successfully', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/orders')
         .set('Authorization', `Bearer ${accessToken}`)
