@@ -1,7 +1,7 @@
 name: "running test"
 
 on:
-  pull_request:
+  push:
     paths:
       - '**/*.ts'
 
