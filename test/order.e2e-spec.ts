@@ -164,8 +164,8 @@ describe('OrderController (e2e)', () => {
         .field('notes', req.notes)
         .field('progresses', req.progresses[0])
         .field('progresses', req.progresses[1])
-        .attach('pictures', path.resolve(__dirname, './logo.png'))
-        .attach('pictures', path.resolve(__dirname, './logo.png'));
+        .attach('pictures', path.resolve(__dirname, './test/logo.png'))
+        .attach('pictures', path.resolve(__dirname, './test/logo.png'));
 
       const body = response.body;
       expect(response.status).toEqual(201);
