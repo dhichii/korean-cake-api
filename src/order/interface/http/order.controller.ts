@@ -50,7 +50,6 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { createFileFilter, MimeType } from '../../../utils/file-filter';
-import path from 'path';
 
 @Controller('/api/v1/orders')
 @UseGuards(JwtGuard)
@@ -107,7 +106,6 @@ export class OrderController {
   ): Promise<ApiResponseDto<AddOrderResponseDto>> {
     body.pictures = files['pictures'];
     console.log(body);
-    console.log(path.resolve(__dirname, './test/logo.png'));
     const data = await this.orderService.add(body, userId);
 
     return new ApiResponseDto(data);
