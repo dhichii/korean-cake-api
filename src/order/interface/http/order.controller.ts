@@ -49,6 +49,7 @@ import {
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { createFileFilter, MimeType } from '../../../utils/file-filter';
 
 @Controller('/api/v1/orders')
 @UseGuards(JwtGuard)
@@ -63,7 +64,11 @@ export class OrderController {
   constructor(@Inject('IOrderService') private orderService: IOrderService) {}
 
   @Post()
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'pictures', maxCount: 3 }]))
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'pictures', maxCount: 3 }], {
+      fileFilter: createFileFilter([MimeType.JPG, MimeType.PNG]),
+    }),
+  )
   @ApiOperation({ summary: 'add new order' })
   @ApiConsumes('multipart/form-data')
   @ApiBearerAuth('Authorization')
@@ -191,7 +196,9 @@ export class OrderController {
 
   @Put(':id')
   @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'addedPictures', maxCount: 3 }]),
+    FileFieldsInterceptor([{ name: 'addedPictures', maxCount: 3 }], {
+      fileFilter: createFileFilter([MimeType.JPG, MimeType.PNG]),
+    }),
   )
   @ApiOperation({ summary: 'edit order by id' })
   @ApiConsumes('multipart/form-data')
