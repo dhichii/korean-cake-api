@@ -10,7 +10,11 @@ export class OrderValidation {
         (v: string) => parseInt(v) || null,
         z.number().nullable(),
       ),
-      isUseTopper: z.preprocess((v: string) => v === 'true', z.boolean()),
+      isUseTopper: z.preprocess((v: string) => {
+        if (v === 'true') return true;
+        if (v === 'false') return false;
+        return v;
+      }, z.boolean()),
       pickupTime: z.preprocess(
         (v: string) => (isNaN(parseInt(v)) ? v : BigInt(v)),
         z.bigint().positive(),
@@ -46,7 +50,11 @@ export class OrderValidation {
         (v: string) => parseInt(v) || null,
         z.number().nullable(),
       ),
-      isUseTopper: z.preprocess((v: string) => v === 'true', z.boolean()),
+      isUseTopper: z.preprocess((v: string) => {
+        if (v === 'true') return true;
+        if (v === 'false') return false;
+        return v;
+      }, z.boolean()),
       pickupTime: z.preprocess(
         (v: string) => (isNaN(parseInt(v)) ? v : BigInt(v)),
         z.bigint().positive(),
