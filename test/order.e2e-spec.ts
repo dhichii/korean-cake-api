@@ -135,7 +135,7 @@ describe('OrderController (e2e)', () => {
         .set('Authorization', `Bearer ${accessToken}`);
 
       const errors = response.body.errors;
-      console.log(errors);
+      expect(response).toEqual('wow');
       expect(response.status).toEqual(400);
       expect(errors[0].path[0]).toEqual('pictures');
       expect(errors[1].path[0]).toEqual('size');
