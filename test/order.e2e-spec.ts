@@ -132,7 +132,6 @@ describe('OrderController (e2e)', () => {
     it('should return 400 when request invalid', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/orders')
-        .set('Content-Type', 'multipart/form-data')
         .set('Authorization', `Bearer ${accessToken}`)
         .field({ notes: req.notes });
 
@@ -154,11 +153,10 @@ describe('OrderController (e2e)', () => {
     it('should add new process successfully', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/orders')
-        .set('Content-Type', 'multipart/form-data')
         .set('Authorization', `Bearer ${accessToken}`)
         .field(req)
-        .attach('pictures', './test/logo.png')
-        .attach('pictures', './test/logo.png');
+        .attach('pictures', 'logo.png')
+        .attach('pictures', 'logo.png');
 
       const body = response.body;
       expect(response.status).toEqual(201);
