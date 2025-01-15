@@ -105,7 +105,7 @@ export class OrderController {
     @Body() body: AddOrderDto,
   ): Promise<ApiResponseDto<AddOrderResponseDto>> {
     body.pictures = files['pictures'];
-
+    console.log(body);
     const data = await this.orderService.add(body, userId);
 
     return new ApiResponseDto(data);
