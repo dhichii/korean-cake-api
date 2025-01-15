@@ -49,7 +49,7 @@ import {
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { createFileFilter, MimeType } from 'src/utils/file-filter';
+import { createFileFilter, MimeType } from '../../../utils/file-filter';
 
 @Controller('/api/v1/orders')
 @UseGuards(JwtGuard)
