@@ -163,10 +163,10 @@ describe('OrderController (e2e)', () => {
         .field('telp', req.telp)
         .field('notes', req.notes)
         .field('progresses', req.progresses[0])
-        .field('progresses', req.progresses[1])
-        .attach('pictures', path.resolve(__dirname, './test/logo.png'))
-        .attach('pictures', path.resolve(__dirname, './test/logo.png'));
-      console.log(path.resolve(__dirname, './test/logo.png'));
+        .field('progresses', req.progresses[1]);
+        // .attach('pictures', path.resolve(__dirname, './test/logo.png'))
+        // .attach('pictures', path.resolve(__dirname, './test/logo.png'));
+      
       const body = response.body;
       expect(response.status).toEqual(201);
       expect(body.status).toEqual('success');
