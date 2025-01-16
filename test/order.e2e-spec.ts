@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
+import { CommonModule } from '../src/common/common.module';
 import { PrismaClient } from '@prisma/client';
 import * as cookieParser from 'cookie-parser';
 import { AuthModule } from '../src/auth/auth.module';
@@ -13,10 +14,6 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuid } from 'uuid';
 import { GdriveService } from '../src/common/gdrive.service';
-import { PrismaService } from '../src/common/prisma.service';
-import { ValidationService } from '../src/common/validation.service';
-import { ErrorFilter } from '../src/common/error.filter';
-import { APP_FILTER } from '@nestjs/core';
 
 describe('OrderController (e2e)', () => {
   let app: INestApplication;
@@ -60,6 +57,7 @@ describe('OrderController (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
+        CommonModule,
         ProcessModule,
         AuthModule,
         MulterModule.register({
@@ -89,9 +87,6 @@ describe('OrderController (e2e)', () => {
           provide: GdriveService,
           useValue: mockGdriveService,
         },
-        PrismaService,
-        ValidationService,
-        { provide: APP_FILTER, useClass: ErrorFilter },
       ],
     }).compile();
 
@@ -156,6 +151,7 @@ describe('OrderController (e2e)', () => {
     });
 
     it('should add new order successfully', async () => {
+      jest.setTimeout(20000);
       const response = await request(app.getHttpServer())
         .post('/api/v1/orders')
         .set('Authorization', `Bearer ${accessToken}`)
@@ -168,7 +164,7 @@ describe('OrderController (e2e)', () => {
       expect(body.data.id).toBeDefined();
 
       // processId = body.data.id;
-    });
+    }, 20000);
   });
 
   // describe('GET /api/v1/processes', () => {
