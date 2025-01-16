@@ -7,6 +7,17 @@ import { diskStorage } from 'multer';
 import { v4 as uuid } from 'uuid';
 import { OrderRepository } from './infrastructure/order.repository';
 import { ProcessModule } from '../process/process.module';
+import { GdriveService } from 'src/common/gdrive.service';
+
+export class test {
+  async upload(file) {
+    return {id: uuid()};
+  }
+
+  async delete(id) {
+    return
+  }
+}
 
 @Module({
   imports: [
@@ -28,6 +39,7 @@ import { ProcessModule } from '../process/process.module';
   providers: [
     { provide: 'IOrderRepository', useClass: OrderRepository },
     { provide: 'IOrderService', useClass: OrderService },
+    { provide: GdriveService, useClass: test },
   ],
 })
 export class OrderModule {}

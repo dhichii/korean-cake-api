@@ -20,8 +20,8 @@ describe('OrderController (e2e)', () => {
   const prismaClient = new PrismaClient();
 
   const mockGdriveService = {
-    upload: jest.fn(() => Promise.resolve({ id: 'xxxxxxxx' })),
-    delete: jest.fn(() => Promise.resolve()),
+    upload: jest.fn().mockResolvedValue({ id: uuid() }),
+    delete: jest.fn().mockResolvedValue(undefined),
   };
 
   // let processId: string;
