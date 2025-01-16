@@ -52,6 +52,7 @@ describe('OrderController (e2e)', () => {
     notes: 'with candle',
     progresses: [],
   };
+  const filePath = path.join(__dirname, 'assets', 'picture.png');
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -154,8 +155,8 @@ describe('OrderController (e2e)', () => {
         .post('/api/v1/orders')
         .set('Authorization', `Bearer ${accessToken}`)
         .field(req)
-        .attach('pictures', 'logo.png')
-        .attach('pictures', 'logo.png');
+        .attach('pictures', filePath)
+        .attach('pictures', filePath);
 
       const body = response.body;
       expect(response.status).toEqual(201);
