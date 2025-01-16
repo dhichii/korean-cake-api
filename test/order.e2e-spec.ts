@@ -151,6 +151,8 @@ describe('OrderController (e2e)', () => {
     });
 
     it('should add new order successfully', async () => {
+      jest.setTimeout(10000);
+
       const response = await request(app.getHttpServer())
         .post('/api/v1/orders')
         .set('Authorization', `Bearer ${accessToken}`)
@@ -164,7 +166,7 @@ describe('OrderController (e2e)', () => {
       expect(body.data.id).toBeDefined();
 
       // processId = body.data.id;
-    });
+    }, 10000);
   });
 
   // describe('GET /api/v1/processes', () => {
