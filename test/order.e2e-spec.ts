@@ -5,7 +5,7 @@ import { CommonModule } from '../src/common/common.module';
 import { PrismaClient } from '@prisma/client';
 import * as cookieParser from 'cookie-parser';
 import { AuthModule } from '../src/auth/auth.module';
-import path from 'path';
+import * as path from 'path';
 import { OrderController } from '../src/order/interface/http/order.controller';
 import { OrderRepository } from '../src/order/infrastructure/order.repository';
 import { OrderService } from '../src/order/application/order.service';
