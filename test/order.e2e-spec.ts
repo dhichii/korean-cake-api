@@ -13,9 +13,9 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuid } from 'uuid';
 import { GdriveService } from '../src/common/gdrive.service';
-import { PrismaService } from 'src/common/prisma.service';
-import { ValidationService } from 'src/common/validation.service';
-import { ErrorFilter } from 'src/common/error.filter';
+import { PrismaService } from '../src/common/prisma.service';
+import { ValidationService } from '../src/common/validation.service';
+import { ErrorFilter } from '../src/common/error.filter';
 import { APP_FILTER } from '@nestjs/core';
 
 describe('OrderController (e2e)', () => {
