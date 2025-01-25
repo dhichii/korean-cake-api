@@ -40,17 +40,17 @@ export class OrderService implements IOrderService {
       // verify order progresses
       await this.processService.verifyAll(req.progresses, userId);
       // upload and mapping pictures
-      for (const picture of req.pictures) {
-        const response = await this.gdriveService.upload(
-          picture,
-          process.env.GDRIVE_ORDER_FOLDER_ID,
-        );
-
+      const folderId = process.env.GDRIVE_ORDER_FOLDER_ID;
+      const uploadTasks = req.pictures.map((picture) =>
+        this.gdriveService.upload(picture, folderId),
+      );
+      const uploadRes = await Promise.all(uploadTasks);
+      uploadRes.forEach((response) => {
         orderPictures.push({
           id: response.id,
           url: `https://drive.google.com/uc?id=${response.id}`,
         });
-      }
+      });
 
       return await this.orderRepository.add(
         mapAddOrderDto(userId, req),
@@ -58,17 +58,17 @@ export class OrderService implements IOrderService {
         req.progresses,
       );
     } catch (e) {
-      for (const picture of orderPictures) {
-        await this.gdriveService.delete(picture.id);
-      }
+      await Promise.allSettled(
+        orderPictures.map((picture) => this.gdriveService.delete(picture.id)),
+      );
 
       throw e;
     } finally {
       // remove the local file
       if (Array.isArray(req.pictures)) {
-        for (const picture of req.pictures) {
-          fs.promises.unlink(picture.path);
-        }
+        await Promise.allSettled(
+          req.pictures.map((picture) => fs.promises.unlink(picture.path)),
+        );
       }
     }
   }
@@ -98,19 +98,19 @@ export class OrderService implements IOrderService {
       await this.processService.verifyAll(req.addedProgresses, userId);
 
       // verify if processes already exist. if exist, remove from request
-      for (const [index, progressId] of req.addedProgresses.entries()) {
-        try {
-          await this.orderRepository.verifyProgress(progressId, id);
-
-          req.addedProgresses.splice(index, 1);
-        } catch (e) {
-          if (e instanceof NotFoundException) {
-            continue;
+      const progressVerifications = req.addedProgresses.map(
+        async (progressId, index) => {
+          try {
+            await this.orderRepository.verifyProgress(progressId, id);
+            req.addedProgresses.splice(index, 1);
+          } catch (e) {
+            if (!(e instanceof NotFoundException)) {
+              throw e;
+            }
           }
-
-          throw e;
-        }
-      }
+        },
+      );
+      await Promise.all(progressVerifications);
 
       // upload and mapping pictures
       for (const picture of req.addedPictures) {
@@ -138,25 +138,23 @@ export class OrderService implements IOrderService {
           try {
             await this.gdriveService.delete(pictureId);
           } catch (e) {
-            if (e.message.includes('File not found')) {
-              continue;
+            if (!e.message.includes('File not found')) {
+              throw e;
             }
-
-            throw e;
           }
         }
       });
     } catch (e) {
-      for (const picture of newPictures) {
-        await this.gdriveService.delete(picture.id);
-      }
+      await Promise.allSettled(
+        newPictures.map((picture) => this.gdriveService.delete(picture.id)),
+      );
 
       throw e;
     } finally {
       // remove the local file
-      for (const picture of req.addedPictures) {
-        fs.promises.unlink(picture.path);
-      }
+      await Promise.allSettled(
+        req.addedPictures.map((picture) => fs.promises.unlink(picture.path)),
+      );
     }
   }
 
