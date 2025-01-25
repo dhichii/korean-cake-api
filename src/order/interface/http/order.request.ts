@@ -4,6 +4,7 @@ import {
   OrderEntity,
 } from '../../../order/domain/order.entity';
 import { v4 as uuid } from 'uuid';
+import { OrderStatus } from './order.response';
 
 export class AddOrderDto {
   @ApiProperty({
@@ -77,6 +78,7 @@ export class GetAllOrderDto {
   userId: string;
   limit: number;
   page: number;
+  status: OrderStatus = OrderStatus.ALL;
 }
 
 export class EditOrderDto {

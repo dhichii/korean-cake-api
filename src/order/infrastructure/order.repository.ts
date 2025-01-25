@@ -49,6 +49,23 @@ export class OrderRepository implements IOrderRepository {
     req: GetAllOrderDto,
   ): Promise<[number, GetAllOrderResponseDto[]]> {
     const where = { userId: req.userId };
+
+    // if status 'INPROGRESS' return the order with some unfinished progresses
+    // if status 'COMPLETED' return the order with every finished progresses
+    if (req.status === OrderStatus.INPROGRESS) {
+      Object.assign(where, {
+        progresses: {
+          every: { isFinish: true },
+        },
+      });
+    } else if (req.status === OrderStatus.COMPLETED) {
+      Object.assign(where, {
+        progresses: {
+          some: { isFinish: false },
+        },
+      });
+    }
+
     const [totalResult, res] = await Promise.all([
       this.db.order.count({ where }),
       this.db.order.findMany({

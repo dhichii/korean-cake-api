@@ -29,6 +29,7 @@ import {
   AddOrderResponseDto,
   GetAllOrderResponseDto,
   GetOrderByIdResponseDto,
+  OrderStatus,
 } from './order.response';
 import {
   AddOrderDto,
@@ -46,6 +47,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
@@ -114,6 +116,13 @@ export class OrderController {
   @Get()
   @ApiOperation({ summary: 'get all orders' })
   @ApiBearerAuth('Authorization')
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: OrderStatus,
+    enumName: 'OrderStatus',
+    description: 'filter orders by status',
+  })
   @ApiOkResponse({
     description: 'Successfully get all orders',
     schema: {
@@ -141,6 +150,7 @@ export class OrderController {
   async getAll(
     @Query('limit', ParseIntPipe) limit: number,
     @Query('page', ParseIntPipe) page: number,
+    @Query('status') status: OrderStatus,
     @User('id') userId: string,
   ): Promise<PaginationResponseDto<GetAllOrderResponseDto[]>> {
     limit = limit || 10;
@@ -149,6 +159,7 @@ export class OrderController {
       userId,
       limit,
       page,
+      status,
     };
     const [totalResult, data] = await this.orderService.getAll(payload);
     const paginationPayload: PaginationPayload<GetAllOrderResponseDto[]> = {

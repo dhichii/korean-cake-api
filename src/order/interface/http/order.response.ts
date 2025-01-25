@@ -6,6 +6,7 @@ export class AddOrderResponseDto {
 }
 
 export enum OrderStatus {
+  ALL = 'Semua',
   INPROGRESS = 'Proses',
   COMPLETED = 'Selesai',
 }
