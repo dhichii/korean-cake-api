@@ -10,8 +10,15 @@ export class OrderValidation {
         (v: string) => parseInt(v) || null,
         z.number().nullable(),
       ),
-      isUseTopper: z.preprocess((v: string) => v === 'true', z.boolean()),
-      pickupTime: z.preprocess((v: string) => BigInt(v), z.bigint().positive()),
+      isUseTopper: z.preprocess((v: string) => {
+        if (v === 'true') return true;
+        if (v === 'false') return false;
+        return v;
+      }, z.boolean()),
+      pickupTime: z.preprocess(
+        (v: string) => (isNaN(parseInt(v)) ? v : BigInt(v)),
+        z.bigint().positive(),
+      ),
       text: z.string(),
       textColor: z.string(),
       price: z.preprocess((v: string) => parseFloat(v), z.number().min(0)),
@@ -43,8 +50,15 @@ export class OrderValidation {
         (v: string) => parseInt(v) || null,
         z.number().nullable(),
       ),
-      isUseTopper: z.preprocess((v: string) => v === 'true', z.boolean()),
-      pickupTime: z.preprocess((v: string) => BigInt(v), z.bigint().positive()),
+      isUseTopper: z.preprocess((v: string) => {
+        if (v === 'true') return true;
+        if (v === 'false') return false;
+        return v;
+      }, z.boolean()),
+      pickupTime: z.preprocess(
+        (v: string) => (isNaN(parseInt(v)) ? v : BigInt(v)),
+        z.bigint().positive(),
+      ),
       text: z.string(),
       textColor: z.string(),
       price: z.preprocess((v: string) => parseFloat(v), z.number().min(0)),
