@@ -161,7 +161,7 @@ export class OrderController {
     @User('id') userId: string,
     @Query('limit', new OptionalParseIntPipe(10)) limit: number,
     @Query('page', new OptionalParseIntPipe(1)) page: number,
-    @Query('status') status: OrderStatus,
+    @Query('status') status: OrderStatus = OrderStatus.ALL,
   ): Promise<PaginationResponseDto<GetAllOrderResponseDto[]>> {
     const payload: GetAllOrderDto = {
       userId,

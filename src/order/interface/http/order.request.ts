@@ -78,7 +78,7 @@ export class GetAllOrderDto {
   userId: string;
   limit: number;
   page: number;
-  status: OrderStatus = OrderStatus.ALL;
+  status: OrderStatus;
 }
 
 export class EditOrderDto {
