@@ -12,7 +12,10 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import {
+  FileFieldsInterceptor,
+  NoFilesInterceptor,
+} from '@nestjs/platform-express';
 import { JwtGuard } from '../../../auth/guards/jwt.guard';
 import { IOrderService } from '../../../order/domain/order.service.interface';
 import {
@@ -280,6 +283,7 @@ export class OrderController {
   }
 
   @Put(':id/progresses/:progressId')
+  @UseInterceptors(NoFilesInterceptor())
   @ApiOperation({ summary: 'edit order progress by id' })
   @ApiConsumes('multipart/form-data')
   @ApiBearerAuth('Authorization')
