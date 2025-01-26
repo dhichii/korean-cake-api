@@ -87,8 +87,8 @@ export class OrderRepository implements IOrderRepository {
       size: v.size,
       status:
         v.progresses.length != 0
-          ? OrderStatus.COMPLETED
-          : OrderStatus.INPROGRESS,
+          ? OrderStatus.INPROGRESS
+          : OrderStatus.COMPLETED,
       layer: v.layer,
       isUseTopper: v.isUseTopper,
       pickupTime: v.pickupTime.toString(),
@@ -151,8 +151,8 @@ export class OrderRepository implements IOrderRepository {
       id: res.id,
       status:
         inprogressProcessesCount != 0
-          ? OrderStatus.COMPLETED
-          : OrderStatus.INPROGRESS,
+          ? OrderStatus.INPROGRESS
+          : OrderStatus.COMPLETED,
       ...res,
       pickupTime: res.pickupTime.toString(),
       pictures: res.pictures,
