@@ -42,7 +42,7 @@ describe('OrderController (e2e)', () => {
     { id: uuid(), name: 'example 2', step: 2 },
     { id: uuid(), name: 'example 3', step: 3 },
   ];
-  const req = {
+  const addReq = {
     size: 10,
     layer: 1,
     isUseTopper: false,
@@ -55,8 +55,13 @@ describe('OrderController (e2e)', () => {
     notes: 'with candle',
     progresses: [processes[0].id, processes[1].id],
   };
-  const addedProgresses = [processes[2].id];
-  const deletedProgresses = req.progresses;
+
+  const editReq = {
+    ...addReq,
+    deletedProgresses: addReq.progresses,
+    addedProgresses: [processes[2].id],
+  };
+
   const editProgressId = processes[2].id;
   const filePath = path.join(__dirname, 'assets', 'logo.png');
 
@@ -134,7 +139,7 @@ describe('OrderController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/orders')
         .set('Authorization', `Bearer ${accessToken}`)
-        .field({ notes: req.notes });
+        .field({ notes: addReq.notes });
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
@@ -154,7 +159,7 @@ describe('OrderController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/orders')
         .set('Authorization', `Bearer ${accessToken}`)
-        .field(req)
+        .field(addReq)
         .attach('pictures', filePath);
 
       const body = response.body;
@@ -187,17 +192,17 @@ describe('OrderController (e2e)', () => {
       expect(body.data.length).toEqual(1);
       expect(data.id).toBeDefined();
       expect(data.status).toEqual(OrderStatus.INPROGRESS);
-      expect(data.size).toEqual(req.size);
-      expect(data.layer).toEqual(req.layer);
-      expect(data.isUseTopper).toEqual(req.isUseTopper);
-      expect(data.pickupTime).toEqual(req.pickupTime.toString());
-      expect(data.text).toEqual(req.text);
-      expect(data.textColor).toEqual(req.textColor);
-      expect(data.price).toEqual(req.price);
-      expect(data.downPayment).toEqual(req.downPayment);
-      expect(data.remainingPayment).toEqual(req.price - req.downPayment);
-      expect(data.telp).toEqual(req.telp);
-      expect(data.notes).toEqual(req.notes);
+      expect(data.size).toEqual(addReq.size);
+      expect(data.layer).toEqual(addReq.layer);
+      expect(data.isUseTopper).toEqual(addReq.isUseTopper);
+      expect(data.pickupTime).toEqual(addReq.pickupTime.toString());
+      expect(data.text).toEqual(addReq.text);
+      expect(data.textColor).toEqual(addReq.textColor);
+      expect(data.price).toEqual(addReq.price);
+      expect(data.downPayment).toEqual(addReq.downPayment);
+      expect(data.remainingPayment).toEqual(addReq.price - addReq.downPayment);
+      expect(data.telp).toEqual(addReq.telp);
+      expect(data.notes).toEqual(addReq.notes);
       expect(data.pictures.length).toEqual(1);
       expect(data.pictures[0].id).toBeDefined();
       expect(data.pictures[0].url).toBeDefined();
@@ -226,17 +231,17 @@ describe('OrderController (e2e)', () => {
       expect(body.status).toEqual('success');
       expect(data.id).toBeDefined();
       expect(data.status).toEqual(OrderStatus.INPROGRESS);
-      expect(data.size).toEqual(req.size);
-      expect(data.layer).toEqual(req.layer);
-      expect(data.isUseTopper).toEqual(req.isUseTopper);
-      expect(data.pickupTime).toEqual(req.pickupTime.toString());
-      expect(data.text).toEqual(req.text);
-      expect(data.textColor).toEqual(req.textColor);
-      expect(data.price).toEqual(req.price);
-      expect(data.downPayment).toEqual(req.downPayment);
-      expect(data.remainingPayment).toEqual(req.price - req.downPayment);
-      expect(data.telp).toEqual(req.telp);
-      expect(data.notes).toEqual(req.notes);
+      expect(data.size).toEqual(addReq.size);
+      expect(data.layer).toEqual(addReq.layer);
+      expect(data.isUseTopper).toEqual(addReq.isUseTopper);
+      expect(data.pickupTime).toEqual(addReq.pickupTime.toString());
+      expect(data.text).toEqual(addReq.text);
+      expect(data.textColor).toEqual(addReq.textColor);
+      expect(data.price).toEqual(addReq.price);
+      expect(data.downPayment).toEqual(addReq.downPayment);
+      expect(data.remainingPayment).toEqual(addReq.price - addReq.downPayment);
+      expect(data.telp).toEqual(addReq.telp);
+      expect(data.notes).toEqual(addReq.notes);
       expect(data.pictures.length).toEqual(1);
       expect(data.pictures[0].id).toBeDefined();
       expect(data.pictures[0].url).toBeDefined();
@@ -262,7 +267,7 @@ describe('OrderController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .put(`/api/v1/orders/${orderId}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .field({ notes: req.notes });
+        .field({ notes: addReq.notes });
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
@@ -280,8 +285,7 @@ describe('OrderController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .put(`/api/v1/orders/${orderId}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .field({ ...req, addedProgresses, deletedProgresses })
-        .attach('addedPictures', filePath);
+        .field(editReq);
 
       expect(response.status).toEqual(200);
       expect(response.body.status).toEqual('success');
