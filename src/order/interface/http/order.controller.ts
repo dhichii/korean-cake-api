@@ -5,7 +5,6 @@ import {
   Get,
   Inject,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -52,6 +51,7 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { createFileFilter, MimeType } from '../../../utils/file-filter';
+import { OptionalParseIntPipe } from '../../../common/optional-parse-int.pipe';
 
 @Controller('/api/v1/orders')
 @UseGuards(JwtGuard)
@@ -117,6 +117,16 @@ export class OrderController {
   @ApiOperation({ summary: 'get all orders' })
   @ApiBearerAuth('Authorization')
   @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
     name: 'status',
     required: false,
     enum: OrderStatus,
@@ -148,13 +158,11 @@ export class OrderController {
     type: InternalServerResponse,
   })
   async getAll(
-    @Query('limit', ParseIntPipe) limit: number,
-    @Query('page', ParseIntPipe) page: number,
-    @Query('status') status: OrderStatus,
     @User('id') userId: string,
+    @Query('limit', new OptionalParseIntPipe(10)) limit: number,
+    @Query('page', new OptionalParseIntPipe(1)) page: number,
+    @Query('status') status: OrderStatus,
   ): Promise<PaginationResponseDto<GetAllOrderResponseDto[]>> {
-    limit = limit || 10;
-    page = page || 1;
     const payload: GetAllOrderDto = {
       userId,
       limit,
