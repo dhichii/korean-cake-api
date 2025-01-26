@@ -121,7 +121,10 @@ export class OrderRepository implements IOrderRepository {
         telp: true,
         notes: true,
         pictures: { select: { id: true, url: true } },
-        progresses: { include: { process: true } },
+        progresses: {
+          include: { process: true },
+          orderBy: { process: { step: 'asc' } },
+        },
       },
       where: { id, userId },
     });
