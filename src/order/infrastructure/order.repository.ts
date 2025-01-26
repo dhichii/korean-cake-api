@@ -55,13 +55,13 @@ export class OrderRepository implements IOrderRepository {
     if (req.status === OrderStatus.INPROGRESS) {
       Object.assign(where, {
         progresses: {
-          every: { isFinish: true },
+          some: { isFinish: false },
         },
       });
     } else if (req.status === OrderStatus.COMPLETED) {
       Object.assign(where, {
         progresses: {
-          some: { isFinish: false },
+          every: { isFinish: true },
         },
       });
     }
