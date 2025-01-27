@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { ProcessModule } from './process/process.module';
 import { OrderModule } from './order/order.module';
+import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -15,6 +17,10 @@ import { OrderModule } from './order/order.module';
     AdminModule,
     ProcessModule,
     OrderModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'node_modules', 'swagger-ui-dist'),
+      serveRoot: '/docs',
+    }),
   ],
   controllers: [AppController],
 })
