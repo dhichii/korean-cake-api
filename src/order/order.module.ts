@@ -13,7 +13,7 @@ import { ProcessModule } from '../process/process.module';
     ProcessModule,
     MulterModule.register({
       storage: diskStorage({
-        destination: './public',
+        destination: process.env.MULTER_UPLOAD_DIRECTORY,
         filename: (_req, file, cb) => {
           // get the file extension
           const ext = path.extname(file.originalname);
