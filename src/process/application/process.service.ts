@@ -23,23 +23,30 @@ export class ProcessService implements IProcessService {
     private prismaService: PrismaService,
   ) {}
 
-  async add(req: AddProcessDto): Promise<AddProcessResponseDto> {
+  async add(
+    userId: string,
+    req: AddProcessDto,
+  ): Promise<AddProcessResponseDto> {
     this.validationService.validate(ProcessValidation.ADD, req);
 
-    return await this.processRepository.add(mapAddProcessDto(req));
+    return await this.processRepository.add(mapAddProcessDto(userId, req));
   }
 
-  async getAll(): Promise<GetAllProcessResponseDto[]> {
-    return await this.processRepository.getAll();
+  async getAll(userId: string): Promise<GetAllProcessResponseDto[]> {
+    return await this.processRepository.getAll(userId);
   }
 
-  async editById(id: string, req: EditProcessDto): Promise<void> {
+  async editById(
+    id: string,
+    userId: string,
+    req: EditProcessDto,
+  ): Promise<void> {
     this.validationService.validate(ProcessValidation.EDIT_BY_ID, {
       id,
       ...req,
     });
 
-    await this.processRepository.verify(id);
+    await this.processRepository.verify(id, userId);
 
     const data = {
       name: req.name,
@@ -48,7 +55,7 @@ export class ProcessService implements IProcessService {
     await this.processRepository.editById(id, data);
   }
 
-  async editSteps(req: EditProcessStepDto[]): Promise<void> {
+  async editSteps(userId: string, req: EditProcessStepDto[]): Promise<void> {
     this.validationService.validate(ProcessValidation.EDIT_STEPS, req);
 
     const ids = [];
@@ -58,7 +65,7 @@ export class ProcessService implements IProcessService {
       processes.push(this.processRepository.editStepById(obj.id, obj.step));
     }
 
-    await this.processRepository.verifyAll(ids);
+    await this.processRepository.verifyAll(ids, userId);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     await this.prismaService.$transaction(async (tx) => {
@@ -66,10 +73,14 @@ export class ProcessService implements IProcessService {
     });
   }
 
-  async deleteById(id: string): Promise<void> {
+  async deleteById(id: string, userId: string): Promise<void> {
     this.validationService.validate(ProcessValidation.DELETE_BY_ID, id);
 
-    await this.processRepository.verify(id);
+    await this.processRepository.verify(id, userId);
     await this.processRepository.deleteById(id);
+  }
+
+  async verifyAll(ids: string[], userId: string): Promise<void> {
+    await this.processRepository.verifyAll(ids, userId);
   }
 }

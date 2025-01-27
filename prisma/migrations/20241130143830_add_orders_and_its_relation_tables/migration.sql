@@ -29,6 +29,7 @@ CREATE TABLE "pictures" (
 -- CreateTable
 CREATE TABLE "processes" (
     "id" VARCHAR(255) NOT NULL,
+    "userId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "step" INTEGER NOT NULL,
 
@@ -39,7 +40,7 @@ CREATE TABLE "processes" (
 CREATE TABLE "order_progresses" (
     "orderId" TEXT NOT NULL,
     "processId" TEXT NOT NULL,
-    "isFinish" BOOLEAN NOT NULL,
+    "isFinish" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "order_progresses_pkey" PRIMARY KEY ("orderId","processId")
 );
@@ -49,6 +50,9 @@ ALTER TABLE "orders" ADD CONSTRAINT "orders_userId_fkey" FOREIGN KEY ("userId") 
 
 -- AddForeignKey
 ALTER TABLE "pictures" ADD CONSTRAINT "pictures_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "orders"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "processes" ADD CONSTRAINT "processes_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "order_progresses" ADD CONSTRAINT "order_progresses_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "orders"("id") ON DELETE CASCADE ON UPDATE CASCADE;

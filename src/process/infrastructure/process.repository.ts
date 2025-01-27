@@ -3,7 +3,10 @@ import { PrismaService } from '../../common/prisma.service';
 import { ProcessEntity } from '../domain/process.entity';
 import { IProcessRepository } from '../domain/process.repository.interface';
 import { EditProcessDto } from '../interface/http/process.request';
-import { AddProcessResponseDto } from '../interface/http/process.response';
+import {
+  AddProcessResponseDto,
+  GetAllProcessResponseDto,
+} from '../interface/http/process.response';
 
 @Injectable()
 export class ProcessRepository implements IProcessRepository {
@@ -15,8 +18,16 @@ export class ProcessRepository implements IProcessRepository {
     return { id };
   }
 
-  async getAll(): Promise<ProcessEntity[]> {
-    return await this.db.process.findMany({ orderBy: { step: 'asc' } });
+  async getAll(userId: string): Promise<GetAllProcessResponseDto[]> {
+    return await this.db.process.findMany({
+      select: {
+        id: true,
+        name: true,
+        step: true,
+      },
+      where: { userId },
+      orderBy: { step: 'asc' },
+    });
   }
 
   async editById(id: string, data: EditProcessDto): Promise<void> {
@@ -31,18 +42,18 @@ export class ProcessRepository implements IProcessRepository {
     await this.db.process.delete({ where: { id } });
   }
 
-  async verify(id: string): Promise<void> {
+  async verify(id: string, userId: string): Promise<void> {
     const result = await this.db.process.count({
-      where: { id },
+      where: { id, userId },
     });
     if (!result) {
       throw new NotFoundException('process not found');
     }
   }
 
-  async verifyAll(ids: string[]): Promise<void> {
+  async verifyAll(ids: string[], userId: string): Promise<void> {
     const result = await this.db.process.count({
-      where: { id: { in: ids } },
+      where: { id: { in: ids }, userId },
     });
 
     if (result != ids.length) {

@@ -23,6 +23,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
+  processes Process[]
   orders Order[]
 
   @@map("users")
@@ -68,8 +69,10 @@ model Picture {
 
 model Process {
   id String @id @db.VarChar(255)
+  userId String
   name String
   step Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders OrderProgress[]
 
   @@map("processes")
@@ -80,7 +83,7 @@ model OrderProgress {
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
   processId String
   process Process @relation(fields: [processId], references: [id], onDelete: Cascade)
-  isFinish Boolean
+  isFinish Boolean @default(false)
 
   @@id([orderId, processId])
   @@map("order_progresses")
