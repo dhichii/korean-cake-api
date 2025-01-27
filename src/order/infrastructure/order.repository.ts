@@ -215,14 +215,14 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async verify(id: string, userId: string): Promise<void> {
-    const res = this.db.order.count({ where: { id, userId } });
+    const res = await this.db.order.count({ where: { id, userId } });
     if (!res) {
       throw new NotFoundException('order not found');
     }
   }
 
   async verifyProgress(processId: string, orderId: string): Promise<void> {
-    const res = this.db.orderProgress.count({
+    const res = await this.db.orderProgress.count({
       where: { orderId, processId },
     });
 
