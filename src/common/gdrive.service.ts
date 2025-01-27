@@ -6,11 +6,15 @@ import * as fs from 'fs';
 export class GdriveService {
   private drive: drive_v3.Drive;
   constructor() {
-    const keyPath = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH;
+    const credentials = JSON.parse(
+      Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString(
+        'utf8',
+      ),
+    );
 
     // initialize the Google auth client
     const auth = new google.auth.GoogleAuth({
-      keyFile: keyPath,
+      credentials,
       scopes: ['https://www.googleapis.com/auth/drive.file'],
     });
 
