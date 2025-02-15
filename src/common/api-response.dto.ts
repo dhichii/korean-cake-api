@@ -63,13 +63,16 @@ export class PaginationResponseDto<T> {
 }
 
 export class ValidationErrorResponse {
+  @ApiProperty({ example: 'Validation Error' })
+  message: string;
+
   @ApiProperty({
     example: [
       {
         code: 'invalid_type',
         expected: 'string',
         received: 'undefined',
-        path: ['username'],
+        path: 'address[0].postalCode',
         message: 'Required',
       },
     ],
@@ -78,10 +81,13 @@ export class ValidationErrorResponse {
 }
 
 export class BadRequestResponse {
+  @ApiProperty({ example: 'Bad Request' })
+  message: string;
+
   @ApiProperty({
     example: [
       {
-        path: ['username'],
+        path: 'username',
         message: 'username is already exist',
       },
     ],
@@ -90,21 +96,21 @@ export class BadRequestResponse {
 }
 
 export class UnauthorizedResponse {
-  @ApiProperty({ example: [{ message: 'Unauthorized' }] })
-  errors;
+  @ApiProperty({ example: 'Unauthorized' })
+  message: string;
 }
 
 export class InvalidCredentialResponse {
-  @ApiProperty({ example: [{ message: 'username or password incorrect' }] })
-  errors;
+  @ApiProperty({ example: 'username or password incorrect' })
+  message: string;
 }
 
 export class ForbiddenResponse {
-  @ApiProperty({ example: [{ message: 'Forbidden resource' }] })
-  errors;
+  @ApiProperty({ example: 'Forbidden resource' })
+  message: string;
 }
 
 export class InternalServerResponse {
-  @ApiProperty({ example: [{ message: 'Internal Server Error' }] })
-  errors;
+  @ApiProperty({ example: 'Internal Server Error' })
+  message: string;
 }

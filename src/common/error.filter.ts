@@ -14,32 +14,39 @@ export class ErrorFilter implements ExceptionFilter {
     switch (true) {
       case exception instanceof HttpException:
         const { message } = exception.getResponse() as HttpException;
-        return response.status(exception.getStatus()).json({
-          errors: [{ message }],
-        });
+        return response.status(exception.getStatus()).json({ message });
       case exception instanceof ZodError:
         return response.status(400).json({
-          errors: JSON.parse(exception.message),
+          message: 'Validation Error',
+          errors: JSON.parse(exception.message).map((error) => ({
+            code: error.message,
+            expected: error.expected,
+            received: error.received,
+            path: error.path
+              .map((p) => (typeof p === 'number' ? `[${p}]` : `.${p}`))
+              .join('')
+              .slice(1),
+            message: error.message,
+          })),
         });
       case exception instanceof Prisma.PrismaClientKnownRequestError:
         if (exception.code === 'P2002') {
           return response.status(400).json({
+            message: 'Bad Request',
             errors: [
               {
-                path: [exception.meta?.target],
+                path: exception.meta?.target,
                 message: `${exception.meta?.target} is already exist`,
               },
             ],
           });
         } else {
-          return response.status(500).json({
-            errors: [{ message: 'Internal Server Error' }],
-          });
+          return response
+            .status(500)
+            .json({ message: 'Internal Server Error' });
         }
       default:
-        return response.status(500).json({
-          errors: [{ message: 'Internal Server Error' }],
-        });
+        return response.status(500).json({ message: 'Internal Server Error' });
     }
   }
 }
