@@ -71,25 +71,25 @@ export class OrderValidation {
       notes: z.string().optional(),
       deletedPictures: z.preprocess(
         (v) => {
+          if (v === undefined) return [];
           if (Array.isArray(v)) return [...new Set(v)];
           if (typeof v === 'string') return [v];
-          if (v === undefined) return [];
           return v;
         },
-        z.array(z.string().min(5).optional()),
+        z.array(z.string().min(5)),
       ),
       addedProgresses: z.preprocess((v) => {
+        if (v === undefined) return [];
         if (Array.isArray(v)) return [...new Set(v)];
         if (typeof v === 'string') return [v];
-        if (v === undefined) return [];
         return v;
-      }, z.array(z.string().uuid().optional())),
+      }, z.array(z.string().uuid())),
       deletedProgresses: z.preprocess((v) => {
+        if (v === undefined) return [];
         if (Array.isArray(v)) return [...new Set(v)];
         if (typeof v === 'string') return [v];
-        if (v === undefined) return [];
         return v;
-      }, z.array(z.string().uuid().optional())),
+      }, z.array(z.string().uuid())),
       addedPictures: z
         .array(z.any())
         .optional()
