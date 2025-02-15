@@ -86,7 +86,6 @@ export class OrderService implements IOrderService {
   }
 
   async editById(id: string, userId: string, req: EditOrderDto): Promise<void> {
-    req.addedPictures = req.addedPictures ?? [];
     const newPictures: OrderPictureDto[] = [];
     try {
       req = this.validationService.validate(OrderValidation.EDIT_BY_ID, req);
