@@ -28,10 +28,11 @@ export class OrderValidation {
       ),
       telp: z.string().regex(NUMBER_REGEX, 'should contains only number'),
       notes: z.string().optional(),
-      progresses: z.preprocess(
-        (v) => (typeof v === 'string' ? [v] : v),
-        z.array(z.string().uuid()),
-      ),
+      progresses: z.preprocess((v) => {
+        if (Array.isArray(v)) return [...new Set(v)];
+        if (typeof v === 'string') return [v];
+        return v;
+      }, z.array(z.string().uuid()).nonempty()),
     })
     .refine((schema) => schema.downPayment <= schema.price, {
       path: ['downPayment'],
@@ -70,21 +71,24 @@ export class OrderValidation {
       notes: z.string().optional(),
       deletedPictures: z.preprocess(
         (v) => {
-          if (Array.isArray(v)) return v;
+          if (Array.isArray(v)) return [...new Set(v)];
           if (typeof v === 'string') return [v];
-          return [];
+          if (v === undefined) return [];
+          return v;
         },
         z.array(z.string().min(5).optional()),
       ),
       addedProgresses: z.preprocess((v) => {
-        if (Array.isArray(v)) return v;
+        if (Array.isArray(v)) return [...new Set(v)];
         if (typeof v === 'string') return [v];
-        return [];
+        if (v === undefined) return [];
+        return v;
       }, z.array(z.string().uuid().optional())),
       deletedProgresses: z.preprocess((v) => {
-        if (Array.isArray(v)) return v;
+        if (Array.isArray(v)) return [...new Set(v)];
         if (typeof v === 'string') return [v];
-        return [];
+        if (v === undefined) return [];
+        return v;
       }, z.array(z.string().uuid().optional())),
       addedPictures: z.array(z.any()).optional(),
     })
