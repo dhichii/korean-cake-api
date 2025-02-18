@@ -19,4 +19,6 @@ export class AuthValidation {
       .regex(USERNAME_REGEX, 'username can only be letters and numbers.'),
     password: z.string().min(8),
   });
+
+  static readonly REVOKE_ALL_BY_USER_ID = z.string().uuid();
 }

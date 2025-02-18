@@ -106,4 +106,13 @@ export class AuthService implements IAuthService {
       exp,
     };
   }
+
+  async revokeAllByUserId(userId: string): Promise<void> {
+    this.validationService.validate(
+      AuthValidation.REVOKE_ALL_BY_USER_ID,
+      userId,
+    );
+
+    await this.authRepository.revokeAllByUserId(userId);
+  }
 }

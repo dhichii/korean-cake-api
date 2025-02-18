@@ -30,4 +30,11 @@ export class AuthRepository implements IAuthRepository {
       where: { token },
     });
   }
+
+  async revokeAllByUserId(userId: string): Promise<void> {
+    await this.db.authentication.updateMany({
+      data: { revoked: true },
+      where: { userId, revoked: false },
+    });
+  }
 }
