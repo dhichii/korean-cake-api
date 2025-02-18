@@ -67,9 +67,8 @@ describe('ProcessController (e2e)', () => {
         '/api/v1/processes',
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 400 when request invalid', async () => {
@@ -79,8 +78,8 @@ describe('ProcessController (e2e)', () => {
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].path[0]).toEqual('name');
-      expect(errors[1].path[0]).toEqual('step');
+      expect(errors[0].path).toEqual('name');
+      expect(errors[1].path).toEqual('step');
     });
 
     it('should add new process successfully', async () => {
@@ -104,9 +103,8 @@ describe('ProcessController (e2e)', () => {
         '/api/v1/processes',
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should get all processes successfully', async () => {
@@ -131,9 +129,8 @@ describe('ProcessController (e2e)', () => {
         `/api/v1/processes/${processId}`,
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 400 when request invalid', async () => {
@@ -143,8 +140,8 @@ describe('ProcessController (e2e)', () => {
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].path[0]).toEqual('name');
-      expect(errors[1].path[0]).toEqual('step');
+      expect(errors[0].path).toEqual('name');
+      expect(errors[1].path).toEqual('step');
     });
 
     it('should edit process successfully', async () => {
@@ -164,9 +161,8 @@ describe('ProcessController (e2e)', () => {
         '/api/v1/processes/steps',
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 400 when request invalid', async () => {
@@ -174,9 +170,8 @@ describe('ProcessController (e2e)', () => {
         .patch('/api/v1/processes/steps')
         .set('Authorization', `Bearer ${accessToken}`);
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].message).toEqual('Expected array, received object');
+      expect(response.body.message).toEqual('Validation Error');
     });
 
     it('should edit process steps successfully', async () => {
@@ -196,9 +191,8 @@ describe('ProcessController (e2e)', () => {
         `/api/v1/processes/${processId}`,
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should delete process successfully', async () => {

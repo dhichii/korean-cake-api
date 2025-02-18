@@ -92,9 +92,8 @@ describe('UserController (e2e)', () => {
         '/api/v1/users/profile',
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should get user profile successfully', async () => {
@@ -121,9 +120,8 @@ describe('UserController (e2e)', () => {
         '/api/v1/users/profile',
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 400 when request invalid', async () => {
@@ -133,7 +131,7 @@ describe('UserController (e2e)', () => {
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].path[0]).toEqual('name');
+      expect(errors[0].path).toEqual('name');
     });
 
     it('should edit user profile successfully', async () => {
@@ -152,9 +150,8 @@ describe('UserController (e2e)', () => {
     it('should return 401 when request credentials invalid', async () => {
       const response = await request(app.getHttpServer()).get(`/api/v1/users`);
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 403 when request forbidden', async () => {
@@ -162,9 +159,8 @@ describe('UserController (e2e)', () => {
         .get(`/api/v1/users`)
         .set('Authorization', `Bearer ${userAccess}`);
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(403);
-      expect(errors[0].message).toEqual('Forbidden resource');
+      expect(response.body.message).toEqual('Forbidden resource');
     });
 
     it('should get all users successfully', async () => {
@@ -194,9 +190,8 @@ describe('UserController (e2e)', () => {
         `/api/v1/users/${userId}`,
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 403 when request forbidden', async () => {
@@ -204,9 +199,8 @@ describe('UserController (e2e)', () => {
         .delete(`/api/v1/users/${userId}`)
         .set('Authorization', `Bearer ${userAccess}`);
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(403);
-      expect(errors[0].message).toEqual('Forbidden resource');
+      expect(response.body.message).toEqual('Forbidden resource');
     });
 
     it('should delete user successfully', async () => {
@@ -224,9 +218,8 @@ describe('UserController (e2e)', () => {
       const response = await request(app.getHttpServer()).patch(
         '/api/v1/users/email',
       );
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 400 when request invalid', async () => {
@@ -237,7 +230,7 @@ describe('UserController (e2e)', () => {
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].path[0]).toEqual('email');
+      expect(errors[0].path).toEqual('email');
     });
 
     it('should change email successfully', async () => {
@@ -266,9 +259,8 @@ describe('UserController (e2e)', () => {
       const response = await request(app.getHttpServer()).patch(
         '/api/v1/users/username',
       );
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 400 when request invalid', async () => {
@@ -279,7 +271,7 @@ describe('UserController (e2e)', () => {
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].path[0]).toEqual('username');
+      expect(errors[0].path).toEqual('username');
     });
 
     it('should change username successfully', async () => {
@@ -305,9 +297,8 @@ describe('UserController (e2e)', () => {
       const response = await request(app.getHttpServer()).patch(
         '/api/v1/users/password',
       );
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 400 when request invalid', async () => {
@@ -317,7 +308,7 @@ describe('UserController (e2e)', () => {
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].path[0]).toEqual('password');
+      expect(errors[0].path).toEqual('password');
     });
 
     it('should change password successfully', async () => {

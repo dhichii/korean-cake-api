@@ -71,10 +71,10 @@ describe('AuthController (e2e)', () => {
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].path[0]).toEqual('name');
-      expect(errors[1].path[0]).toEqual('username');
-      expect(errors[2].path[0]).toEqual('email');
-      expect(errors[3].path[0]).toEqual('password');
+      expect(errors[0].path).toEqual('name');
+      expect(errors[1].path).toEqual('username');
+      expect(errors[2].path).toEqual('email');
+      expect(errors[3].path).toEqual('password');
     });
 
     it('should register successfully', async () => {
@@ -91,9 +91,10 @@ describe('AuthController (e2e)', () => {
         .post('/api/v1/auth/register')
         .send(user);
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].message).toEqual('username is already exist');
+      expect(response.body.errors[0].message).toEqual(
+        'username is already exist',
+      );
     });
 
     it('should return 400 when email is already exist', async () => {
@@ -101,9 +102,8 @@ describe('AuthController (e2e)', () => {
         .post('/api/v1/auth/register')
         .send({ ...user, username: 'otherusername' });
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].message).toEqual('email is already exist');
+      expect(response.body.errors[0].message).toEqual('email is already exist');
     });
   });
 
@@ -115,8 +115,8 @@ describe('AuthController (e2e)', () => {
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].path[0]).toEqual('username');
-      expect(errors[1].path[0]).toEqual('password');
+      expect(errors[0].path).toEqual('username');
+      expect(errors[1].path).toEqual('password');
     });
 
     it('should return 401 when request credentials invalid', async () => {
@@ -127,9 +127,8 @@ describe('AuthController (e2e)', () => {
           password: 'wrongpassword',
         });
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('username or password incorrect');
+      expect(response.body.message).toEqual('username or password incorrect');
     });
 
     it('should login successfully', async () => {
@@ -157,9 +156,8 @@ describe('AuthController (e2e)', () => {
         '/api/v1/auth/refresh',
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 401 when refresh token is not found', async () => {
@@ -167,9 +165,8 @@ describe('AuthController (e2e)', () => {
         .post('/api/v1/auth/refresh')
         .set('Cookie', [`refresh=${invalidRefreshToken}`]);
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should refresh token successfully', async () => {
@@ -202,9 +199,8 @@ describe('AuthController (e2e)', () => {
         '/api/v1/auth/logout',
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should logout successfully', async () => {

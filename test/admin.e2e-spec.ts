@@ -68,9 +68,8 @@ describe('AdminController (e2e)', () => {
     it('should return 401 when request credentials invalid', async () => {
       const response = await request(app.getHttpServer()).post('/api/v1/admin');
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 403 when request forbidden', async () => {
@@ -78,9 +77,8 @@ describe('AdminController (e2e)', () => {
         .post('/api/v1/admin')
         .set('Authorization', `Bearer ${forbiddenToken}`);
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(403);
-      expect(errors[0].message).toEqual('Forbidden resource');
+      expect(response.body.message).toEqual('Forbidden resource');
     });
 
     it('should return 400 when request invalid', async () => {
@@ -90,9 +88,9 @@ describe('AdminController (e2e)', () => {
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].path[0]).toEqual('name');
-      expect(errors[1].path[0]).toEqual('username');
-      expect(errors[2].path[0]).toEqual('email');
+      expect(errors[0].path).toEqual('name');
+      expect(errors[1].path).toEqual('username');
+      expect(errors[2].path).toEqual('email');
     });
 
     it('should add new admin successfully', async () => {
@@ -116,9 +114,10 @@ describe('AdminController (e2e)', () => {
         .set('Authorization', `Bearer ${validToken}`)
         .send(adminUser);
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].message).toEqual('username is already exist');
+      expect(response.body.errors[0].message).toEqual(
+        'username is already exist',
+      );
     });
 
     it('should return 400 when email is already exist', async () => {
@@ -131,9 +130,8 @@ describe('AdminController (e2e)', () => {
         .set('Authorization', `Bearer ${validToken}`)
         .send(req);
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].message).toEqual('email is already exist');
+      expect(response.body.errors[0].message).toEqual('email is already exist');
     });
   });
 
@@ -141,9 +139,8 @@ describe('AdminController (e2e)', () => {
     it('should return 401 when request credentials invalid', async () => {
       const response = await request(app.getHttpServer()).get('/api/v1/admin');
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 403 when request forbidden', async () => {
@@ -151,9 +148,8 @@ describe('AdminController (e2e)', () => {
         .get('/api/v1/admin')
         .set('Authorization', `Bearer ${forbiddenToken}`);
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(403);
-      expect(errors[0].message).toEqual('Forbidden resource');
+      expect(response.body.message).toEqual('Forbidden resource');
     });
 
     it('should get all admin successfully', async () => {
@@ -179,9 +175,8 @@ describe('AdminController (e2e)', () => {
         `/api/v1/admin/${adminId}`,
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 403 when request forbidden', async () => {
@@ -189,9 +184,8 @@ describe('AdminController (e2e)', () => {
         .delete(`/api/v1/admin/${adminId}`)
         .set('Authorization', `Bearer ${forbiddenToken}`);
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(403);
-      expect(errors[0].message).toEqual('Forbidden resource');
+      expect(response.body.message).toEqual('Forbidden resource');
     });
 
     it('should delete admin successfully', async () => {
