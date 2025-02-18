@@ -6,4 +6,5 @@ export interface IAuthService {
   login(payload: JWTSignPayload): Promise<TokenResponse>;
   logout(refreshToken: string): Promise<void>;
   refresh(req: RefreshReq): Promise<TokenResponse>;
+  revokeAllByUserId(userId: string): Promise<void>;
 }

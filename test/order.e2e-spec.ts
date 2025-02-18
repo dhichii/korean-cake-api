@@ -130,9 +130,8 @@ describe('OrderController (e2e)', () => {
         '/api/v1/orders',
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 400 when request invalid', async () => {
@@ -143,16 +142,16 @@ describe('OrderController (e2e)', () => {
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].path[0]).toEqual('pictures');
-      expect(errors[1].path[0]).toEqual('size');
-      expect(errors[2].path[0]).toEqual('isUseTopper');
-      expect(errors[3].path[0]).toEqual('pickupTime');
-      expect(errors[4].path[0]).toEqual('text');
-      expect(errors[5].path[0]).toEqual('textColor');
-      expect(errors[6].path[0]).toEqual('price');
-      expect(errors[7].path[0]).toEqual('downPayment');
-      expect(errors[8].path[0]).toEqual('telp');
-      expect(errors[9].path[0]).toEqual('progresses');
+      expect(errors[0].path).toEqual('pictures');
+      expect(errors[1].path).toEqual('size');
+      expect(errors[2].path).toEqual('isUseTopper');
+      expect(errors[3].path).toEqual('pickupTime');
+      expect(errors[4].path).toEqual('text');
+      expect(errors[5].path).toEqual('textColor');
+      expect(errors[6].path).toEqual('price');
+      expect(errors[7].path).toEqual('downPayment');
+      expect(errors[8].path).toEqual('telp');
+      expect(errors[9].path).toEqual('progresses');
     });
 
     it('should add new orders successfully', async () => {
@@ -175,9 +174,8 @@ describe('OrderController (e2e)', () => {
     it('should return 401 when request credentials invalid', async () => {
       const response = await request(app.getHttpServer()).get('/api/v1/orders');
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should get all orders successfully', async () => {
@@ -215,9 +213,8 @@ describe('OrderController (e2e)', () => {
         `/api/v1/orders/${orderId}`,
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should get order by id successfully', async () => {
@@ -258,9 +255,8 @@ describe('OrderController (e2e)', () => {
         `/api/v1/orders/${orderId}`,
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should return 400 when request invalid', async () => {
@@ -271,14 +267,14 @@ describe('OrderController (e2e)', () => {
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].path[0]).toEqual('size');
-      expect(errors[1].path[0]).toEqual('isUseTopper');
-      expect(errors[2].path[0]).toEqual('pickupTime');
-      expect(errors[3].path[0]).toEqual('text');
-      expect(errors[4].path[0]).toEqual('textColor');
-      expect(errors[5].path[0]).toEqual('price');
-      expect(errors[6].path[0]).toEqual('downPayment');
-      expect(errors[7].path[0]).toEqual('telp');
+      expect(errors[0].path).toEqual('size');
+      expect(errors[1].path).toEqual('isUseTopper');
+      expect(errors[2].path).toEqual('pickupTime');
+      expect(errors[3].path).toEqual('text');
+      expect(errors[4].path).toEqual('textColor');
+      expect(errors[5].path).toEqual('price');
+      expect(errors[6].path).toEqual('downPayment');
+      expect(errors[7].path).toEqual('telp');
     });
 
     it('should edit order by id successfully', async () => {
@@ -298,9 +294,8 @@ describe('OrderController (e2e)', () => {
         `/api/v1/orders/${orderId}/progresses/${editProgressId}`,
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should edit order progress by id successfully', async () => {
@@ -320,9 +315,8 @@ describe('OrderController (e2e)', () => {
         `/api/v1/orders/${orderId}`,
       );
 
-      const errors = response.body.errors;
       expect(response.status).toEqual(401);
-      expect(errors[0].message).toEqual('Unauthorized');
+      expect(response.body.message).toEqual('Unauthorized');
     });
 
     it('should delete order by id successfully', async () => {

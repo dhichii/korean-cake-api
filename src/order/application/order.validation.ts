@@ -90,10 +90,7 @@ export class OrderValidation {
         if (typeof v === 'string') return [v];
         return v;
       }, z.array(z.string().uuid())),
-      addedPictures: z
-        .array(z.any())
-        .optional()
-        .transform((v) => v ?? []),
+      addedPictures: z.array(z.any()).optional(),
     })
     .refine((schema) => schema.downPayment <= schema.price, {
       path: ['downPayment'],

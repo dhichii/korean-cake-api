@@ -25,14 +25,17 @@ model User {
   deletedAt DateTime?
   processes Process[]
   orders Order[]
+  authentications Authentication[]
 
   @@map("users")
 }
 
 model Authentication {
   token String @id @db.VarChar(500)
+  userId String
   expiresAt DateTime
   revoked Boolean @default(false)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("authentications")
 }

@@ -7,9 +7,9 @@ import { AuthEntity } from '../domain/auth.entity';
 export class AuthRepository implements IAuthRepository {
   constructor(private db: PrismaService) {}
 
-  async add(token: string, expiresAt: Date): Promise<void> {
+  async add(userId: string, token: string, expiresAt: Date): Promise<void> {
     await this.db.authentication.create({
-      data: { token, expiresAt },
+      data: { userId, token, expiresAt },
     });
   }
 
@@ -28,6 +28,13 @@ export class AuthRepository implements IAuthRepository {
     await this.db.authentication.update({
       data: { revoked: true },
       where: { token },
+    });
+  }
+
+  async revokeAllByUserId(userId: string): Promise<void> {
+    await this.db.authentication.updateMany({
+      data: { revoked: true },
+      where: { userId, revoked: false },
     });
   }
 }

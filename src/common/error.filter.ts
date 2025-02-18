@@ -31,14 +31,13 @@ export class ErrorFilter implements ExceptionFilter {
         });
       case exception instanceof Prisma.PrismaClientKnownRequestError:
         if (exception.code === 'P2002') {
+          const target = exception.meta?.target as string[];
           return response.status(400).json({
             message: 'Bad Request',
-            errors: [
-              {
-                path: exception.meta?.target,
-                message: `${exception.meta?.target} is already exist`,
-              },
-            ],
+            errors: target.map((v) => ({
+              path: v,
+              message: `${v} is already exist`,
+            })),
           });
         } else {
           return response

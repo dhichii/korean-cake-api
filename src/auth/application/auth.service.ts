@@ -71,7 +71,7 @@ export class AuthService implements IAuthService {
     const { exp } = this.jwtService.decode(refresh);
     const expiresAt = convertMilisToDate(exp);
 
-    await this.authRepository.add(refresh, expiresAt);
+    await this.authRepository.add(payload.id, refresh, expiresAt);
 
     return {
       access,
@@ -97,7 +97,7 @@ export class AuthService implements IAuthService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     await this.prismaService.$transaction(async (tx) => {
       await this.authRepository.revoke(req.refresh);
-      await this.authRepository.add(refresh, expiresAt);
+      await this.authRepository.add(req.payload.id, refresh, expiresAt);
     });
 
     return {
@@ -105,5 +105,14 @@ export class AuthService implements IAuthService {
       refresh,
       exp,
     };
+  }
+
+  async revokeAllByUserId(userId: string): Promise<void> {
+    this.validationService.validate(
+      AuthValidation.REVOKE_ALL_BY_USER_ID,
+      userId,
+    );
+
+    await this.authRepository.revokeAllByUserId(userId);
   }
 }

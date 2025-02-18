@@ -109,8 +109,7 @@ export class OrderController {
     @User('id') userId: string,
     @Body() body: AddOrderDto,
   ): Promise<ApiResponseDto<AddOrderResponseDto>> {
-    body.pictures = files['pictures'];
-
+    body.pictures = files?.pictures;
     const data = await this.orderService.add(body, userId);
 
     return new ApiResponseDto(data);
@@ -247,7 +246,7 @@ export class OrderController {
     @User('id') userId: string,
     @Body() body: EditOrderDto,
   ): Promise<StatusResponseDto> {
-    body.addedPictures = files['addedPictures'];
+    body.addedPictures = files?.addedPictures ?? [];
 
     const data = await this.orderService.editById(id, userId, body);
 
