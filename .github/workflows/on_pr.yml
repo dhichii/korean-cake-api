@@ -48,3 +48,5 @@ jobs:
           SUPER_USERNAME: ${{ secrets.SUPER_USERNAME_TEST }}
           SUPER_EMAIL: ${{ secrets.SUPER_EMAIL_TEST }}
           SUPER_PASSWORD: ${{ secrets.SUPER_PASSWORD_TEST }}
+          # Google Drive
+          GOOGLE_CREDENTIALS_BASE64: ${{ secrets.GOOGLE_CREDENTIALS_BASE64 }}
