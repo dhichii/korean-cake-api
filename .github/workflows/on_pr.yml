@@ -34,7 +34,6 @@ jobs:
           npm install
           npm run migrate
           npm run seed
-          mkdir public
           npm test
           npm run test:e2e
         env:
