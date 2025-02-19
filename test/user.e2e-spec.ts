@@ -293,6 +293,19 @@ describe('UserController (e2e)', () => {
   });
 
   describe('PATCH /api/v1/users/password', () => {
+    const invalidOldPasswordRequest = {
+      oldPassword: 'invalidpassword',
+      newPassword: admin.password,
+    };
+    const invalidNewPasswordRequest = {
+      oldPassword: admin.password,
+      newPassword: admin.password,
+    };
+    const validRequest = {
+      oldPassword: admin.password,
+      newPassword: 'newpassword',
+    };
+
     it('should return 401 when request credentials invalid', async () => {
       const response = await request(app.getHttpServer()).patch(
         '/api/v1/users/password',
@@ -308,14 +321,37 @@ describe('UserController (e2e)', () => {
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].path).toEqual('password');
+      expect(errors[0].path).toEqual('oldPassword');
+      expect(errors[1].path).toEqual('newPassword');
+    });
+
+    it('should return 400 when old password request invalid', async () => {
+      const response = await request(app.getHttpServer())
+        .patch('/api/v1/users/password')
+        .set('Authorization', `Bearer ${adminAccess}`)
+        .send(invalidOldPasswordRequest);
+
+      expect(response.status).toEqual(400);
+      expect(response.body.message).toEqual('old password incorrect');
+    });
+
+    it('should return 400 when new password is the same as the old password request invalid', async () => {
+      const response = await request(app.getHttpServer())
+        .patch('/api/v1/users/password')
+        .set('Authorization', `Bearer ${adminAccess}`)
+        .send(invalidNewPasswordRequest);
+
+      expect(response.status).toEqual(400);
+      expect(response.body.message).toEqual(
+        'new password cannot be the same as the old password',
+      );
     });
 
     it('should change password successfully', async () => {
       const response = await request(app.getHttpServer())
         .patch('/api/v1/users/password')
         .set('Authorization', `Bearer ${adminAccess}`)
-        .send(admin);
+        .send(validRequest);
 
       expect(response.status).toEqual(200);
       expect(response.body.status).toEqual('success');

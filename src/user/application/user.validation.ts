@@ -43,6 +43,7 @@ export class UserValidation {
 
   static readonly CHANGE_PASSWORD: ZodType = z.object({
     id: z.string().uuid(),
-    password: z.string().min(8),
+    oldPassword: z.string().min(8),
+    newPassword: z.string().min(8),
   });
 }
