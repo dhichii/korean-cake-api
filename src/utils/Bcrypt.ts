@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -9,10 +9,7 @@ export class Bcrypt {
     return await bcrypt.hash(password, this.saltRound);
   }
 
-  async compare(password: string, hashedPassword: string) {
-    const isCorrect = await bcrypt.compare(password, hashedPassword);
-    if (!isCorrect) {
-      throw new UnauthorizedException('username or password incorrect');
-    }
+  async compare(password: string, hashedPassword: string): Promise<boolean> {
+    return await bcrypt.compare(password, hashedPassword);
   }
 }
