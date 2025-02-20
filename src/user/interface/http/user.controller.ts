@@ -46,7 +46,7 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { ChangeUserPasswordDto, EditUserProfileDto } from './user.request';
-import { User } from 'src/common/decorator/user.decorator';
+import { User } from '../../../common/decorator/user.decorator';
 
 @Controller('/api/v1/users')
 @ApiExtraModels(
