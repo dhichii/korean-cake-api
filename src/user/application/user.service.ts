@@ -116,13 +116,16 @@ export class UserService implements IUserService {
   ): Promise<TokenResponse> {
     this.validationService.validate(UserValidation.CHANGE_EMAIL, { id, email });
 
+    // verify the refresh token
+    await this.authService.get(refreshToken);
+
     const user = await this.getById(id);
 
     let data: TokenResponse;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     await this.prismaService.$transaction(async (tx) => {
       await this.userRepository.changeEmail(id, email);
-      await this.authService.logout(refreshToken);
+      await this.authService.revokeAllByUserId(id);
       data = await this.authService.login({ ...user, email });
     });
 
@@ -139,13 +142,16 @@ export class UserService implements IUserService {
       username,
     });
 
+    // verify the refresh token
+    await this.authService.get(refreshToken);
+
     const user = await this.getById(id);
 
     let data: TokenResponse;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     await this.prismaService.$transaction(async (tx) => {
       await this.userRepository.changeUsername(id, username);
-      await this.authService.logout(refreshToken);
+      await this.authService.revokeAllByUserId(id);
       data = await this.authService.login({ ...user, username });
     });
 
