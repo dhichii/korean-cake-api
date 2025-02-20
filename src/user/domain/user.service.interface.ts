@@ -1,5 +1,9 @@
 import { Role } from '@prisma/client';
-import { AddUserDto, EditUserProfileDto } from '../interface/http/user.request';
+import {
+  AddUserDto,
+  ChangeUserPasswordDto,
+  EditUserProfileDto,
+} from '../interface/http/user.request';
 import {
   UserResponseDto,
   UserWithPasswordResponseDto,
@@ -23,5 +27,5 @@ export interface IUserService {
     refreshToken: string,
     username: string,
   ): Promise<TokenResponse>;
-  changePassword(id: string, password: string): Promise<void>;
+  changePassword(id: string, req: ChangeUserPasswordDto): Promise<void>;
 }

@@ -29,3 +29,11 @@ export class EditUserProfileDto {
   @ApiProperty({ example: 'example' })
   name: string;
 }
+
+export class ChangeUserPasswordDto {
+  @ApiProperty({ example: 'verystrongpassword' })
+  oldPassword: string;
+
+  @ApiProperty({ example: 'newstrongpassword' })
+  newPassword: string;
+}

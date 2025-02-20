@@ -1,7 +1,13 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { IUserRepository } from '../domain/user.repository.interface';
 import {
   AddUserDto,
+  ChangeUserPasswordDto,
   EditUserProfileDto,
   mapAddUserDto,
 } from '../interface/http/user.request';
@@ -110,17 +116,21 @@ export class UserService implements IUserService {
   ): Promise<TokenResponse> {
     this.validationService.validate(UserValidation.CHANGE_EMAIL, { id, email });
 
+    // verify the refresh token
+    await this.authService.get(refreshToken);
+
     const user = await this.getById(id);
 
-    let data: TokenResponse;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    await this.prismaService.$transaction(async (tx) => {
-      await this.userRepository.changeEmail(id, email);
-      await this.authService.logout(refreshToken);
-      data = await this.authService.login({ ...user, email });
-    });
+    return await this.prismaService.$transaction(async (tx) => {
+      Promise.all([
+        this.userRepository.changeEmail(id, email),
+        this.authService.revokeAllByUserId(id),
+      ]);
 
-    return data;
+      // return new access and refresh token
+      return await this.authService.login({ ...user, email });
+    });
   }
 
   async changeUsername(
@@ -133,28 +143,62 @@ export class UserService implements IUserService {
       username,
     });
 
+    // verify the refresh token
+    await this.authService.get(refreshToken);
+
     const user = await this.getById(id);
 
-    let data: TokenResponse;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    await this.prismaService.$transaction(async (tx) => {
-      await this.userRepository.changeUsername(id, username);
-      await this.authService.logout(refreshToken);
-      data = await this.authService.login({ ...user, username });
-    });
+    return await this.prismaService.$transaction(async (tx) => {
+      Promise.all([
+        this.userRepository.changeUsername(id, username),
+        this.authService.revokeAllByUserId(id),
+      ]);
 
-    return data;
+      // return new access and refresh token
+      return await this.authService.login({ ...user, username });
+    });
   }
 
-  async changePassword(id: string, password: string): Promise<void> {
+  async changePassword(id: string, req: ChangeUserPasswordDto): Promise<void> {
     this.validationService.validate(UserValidation.CHANGE_PASSWORD, {
       id,
-      password,
+      ...req,
     });
 
-    await this.userRepository.verify(id);
+    const bcrypt = new Bcrypt();
+    const { password: hashedPassword } = await this.userRepository.getById(id);
 
-    const hashedPassword = await new Bcrypt().hash(password);
-    await this.userRepository.changePassword(id, hashedPassword);
+    // check if the old password is correct
+    const isOldPasswordCorrect = await bcrypt.compare(
+      req.oldPassword,
+      hashedPassword,
+    );
+    if (!isOldPasswordCorrect) {
+      throw new BadRequestException('old password incorrect');
+    }
+
+    // prevent using the same password
+    const isSamePassword = await bcrypt.compare(
+      req.newPassword,
+      hashedPassword,
+    );
+    if (isSamePassword) {
+      throw new BadRequestException(
+        'new password cannot be the same as the old password',
+      );
+    }
+
+    const newHashedPassword = await bcrypt.hash(req.newPassword);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    await this.prismaService.$transaction(async (tx) =>
+      Promise.all([
+        this.userRepository.changePassword(id, newHashedPassword),
+
+        // revoke all authentication tokens
+        this.authService.revokeAllByUserId(id),
+      ]),
+    );
   }
 }

@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -44,7 +45,8 @@ import {
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { EditUserProfileDto } from './user.request';
+import { ChangeUserPasswordDto, EditUserProfileDto } from './user.request';
+import { User } from '../../../common/decorator/user.decorator';
 
 @Controller('/api/v1/users')
 @ApiExtraModels(
@@ -327,17 +329,6 @@ export class UserController {
   @UseGuards(JwtGuard)
   @ApiOperation({ summary: 'change password' })
   @ApiBearerAuth('Authorization')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        password: {
-          type: 'string',
-          example: 'example',
-        },
-      },
-    },
-  })
   @ApiOkResponse({
     description: 'Successfully change password',
     type: StatusResponseDto,
@@ -354,12 +345,11 @@ export class UserController {
     description: 'Internal Server Error',
     type: InternalServerResponse,
   })
-  async changePassword(@Req() req: Request): Promise<StatusResponseDto> {
-    const user = req.user as JWTSignPayload;
-
-    const password = req.body.password;
-
-    await this.userService.changePassword(user.id, password);
+  async changePassword(
+    @User('id') id: string,
+    @Body() body: ChangeUserPasswordDto,
+  ): Promise<StatusResponseDto> {
+    await this.userService.changePassword(id, body);
 
     return new StatusResponseDto();
   }

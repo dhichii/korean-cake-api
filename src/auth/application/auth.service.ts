@@ -16,6 +16,7 @@ import { IAuthRepository } from '../domain/auth.repository.interface';
 import { PrismaService } from '../../common/prisma.service';
 import { convertMilisToDate } from '../../utils/date';
 import { AuthValidation } from './auth.validation';
+import { AuthEntity } from '../domain/auth.entity';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -35,7 +36,10 @@ export class AuthService implements IAuthService {
       const { password: hashedPassword, ...user } =
         await this.userService.getByUsername(username);
 
-      await new Bcrypt().compare(password, hashedPassword);
+      const isCorrect = await new Bcrypt().compare(password, hashedPassword);
+      if (!isCorrect) {
+        throw new UnauthorizedException('username or password incorrect');
+      }
 
       return user;
     } catch (e: unknown) {
@@ -114,5 +118,9 @@ export class AuthService implements IAuthService {
     );
 
     await this.authRepository.revokeAllByUserId(userId);
+  }
+
+  async get(refreshToken: string): Promise<AuthEntity> {
+    return await this.authRepository.get(refreshToken);
   }
 }
