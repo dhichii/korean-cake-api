@@ -121,15 +121,16 @@ export class UserService implements IUserService {
 
     const user = await this.getById(id);
 
-    let data: TokenResponse;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    await this.prismaService.$transaction(async (tx) => {
-      await this.userRepository.changeEmail(id, email);
-      await this.authService.revokeAllByUserId(id);
-      data = await this.authService.login({ ...user, email });
-    });
+    return await this.prismaService.$transaction(async (tx) => {
+      Promise.all([
+        this.userRepository.changeEmail(id, email),
+        this.authService.revokeAllByUserId(id),
+      ]);
 
-    return data;
+      // return new access and refresh token
+      return await this.authService.login({ ...user, email });
+    });
   }
 
   async changeUsername(
@@ -147,15 +148,16 @@ export class UserService implements IUserService {
 
     const user = await this.getById(id);
 
-    let data: TokenResponse;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    await this.prismaService.$transaction(async (tx) => {
-      await this.userRepository.changeUsername(id, username);
-      await this.authService.revokeAllByUserId(id);
-      data = await this.authService.login({ ...user, username });
-    });
+    return await this.prismaService.$transaction(async (tx) => {
+      Promise.all([
+        this.userRepository.changeUsername(id, username),
+        this.authService.revokeAllByUserId(id),
+      ]);
 
-    return data;
+      // return new access and refresh token
+      return await this.authService.login({ ...user, username });
+    });
   }
 
   async changePassword(id: string, req: ChangeUserPasswordDto): Promise<void> {
