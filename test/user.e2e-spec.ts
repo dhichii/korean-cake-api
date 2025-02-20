@@ -251,6 +251,8 @@ describe('UserController (e2e)', () => {
       expect(refreshCookie).toContain('SameSite=Strict');
       expect(body.status).toEqual('success');
       expect(body.data.access).toBeDefined();
+
+      adminRefresh = refreshCookie.split(';')[0].split('refresh=')[1];
     });
   });
 
@@ -289,6 +291,8 @@ describe('UserController (e2e)', () => {
       expect(refreshCookie).toContain('SameSite=Strict');
       expect(body.status).toEqual('success');
       expect(body.data.access).toBeDefined();
+
+      adminRefresh = refreshCookie.split(';')[0].split('refresh=')[1];
     });
   });
 
