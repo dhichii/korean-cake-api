@@ -302,7 +302,7 @@ describe('OrderController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .put(`/api/v1/orders/${orderId}/progresses/${editProgressId}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .field({ isFinished: true });
+        .send({ isFinish: true });
 
       expect(response.status).toEqual(200);
       expect(response.body.status).toEqual('success');

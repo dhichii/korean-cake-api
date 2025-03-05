@@ -284,7 +284,6 @@ export class OrderController {
   @Put(':id/progresses/:progressId')
   @UseInterceptors(NoFilesInterceptor())
   @ApiOperation({ summary: 'edit order progress by id' })
-  @ApiConsumes('multipart/form-data')
   @ApiBearerAuth('Authorization')
   @ApiOkResponse({
     description: 'Successfully edit order progress by id',
