@@ -28,6 +28,9 @@ export class OrderProgressResponseDto {
 
   @ApiProperty({ example: 1 })
   step: number;
+
+  @ApiProperty({ example: true })
+  isFinish: boolean;
 }
 
 export class GetAllOrderResponseDto {
