@@ -103,6 +103,6 @@ export class OrderValidation {
   });
 
   static readonly EDIT_PROGRESS_BY_ID: ZodType = z.object({
-    isFinish: z.preprocess((v: string) => v === 'true', z.boolean()),
+    isFinish: z.boolean(),
   });
 }
