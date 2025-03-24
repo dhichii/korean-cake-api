@@ -4,35 +4,21 @@ import { z, ZodType } from 'zod';
 export class OrderValidation {
   static readonly ADD: ZodType = z
     .object({
-      pictures: z.array(z.any()).nonempty(),
-      size: z.preprocess((v: string) => parseInt(v), z.number().min(10)),
-      layer: z.preprocess(
-        (v: string) => parseInt(v) || null,
-        z.number().nullable(),
-      ),
-      isUseTopper: z.preprocess((v: string) => {
-        if (v === 'true') return true;
-        if (v === 'false') return false;
-        return v;
-      }, z.boolean()),
+      pictures: z.array(z.any()).max(3).nonempty(),
+      size: z.number().int().min(10),
+      layer: z.number().int().positive().optional().nullable(),
+      isUseTopper: z.boolean(),
       pickupTime: z.preprocess(
         (v: string) => (isNaN(parseInt(v)) ? v : BigInt(v)),
         z.bigint().positive(),
       ),
-      text: z.string(),
-      textColor: z.string(),
-      price: z.preprocess((v: string) => parseFloat(v), z.number().min(0)),
-      downPayment: z.preprocess(
-        (v: string) => parseFloat(v),
-        z.number().min(0),
-      ),
+      text: z.string().max(255),
+      textColor: z.string().max(120),
+      price: z.number().min(0),
+      downPayment: z.number().min(0),
       telp: z.string().regex(NUMBER_REGEX, 'should contains only number'),
-      notes: z.string().optional(),
-      progresses: z.preprocess((v) => {
-        if (Array.isArray(v)) return [...new Set(v)];
-        if (typeof v === 'string') return [v];
-        return v;
-      }, z.array(z.string().uuid()).nonempty()),
+      notes: z.string().optional().nullable(),
+      progresses: z.array(z.string().uuid()).nonempty(),
     })
     .refine((schema) => schema.downPayment <= schema.price, {
       path: ['downPayment'],
@@ -46,51 +32,23 @@ export class OrderValidation {
 
   static readonly EDIT_BY_ID: ZodType = z
     .object({
-      size: z.preprocess((v: string) => parseInt(v), z.number().min(10)),
-      layer: z.preprocess(
-        (v: string) => parseInt(v) || null,
-        z.number().nullable(),
-      ),
-      isUseTopper: z.preprocess((v: string) => {
-        if (v === 'true') return true;
-        if (v === 'false') return false;
-        return v;
-      }, z.boolean()),
+      size: z.number().int().min(10),
+      layer: z.number().int().positive().optional().nullable(),
+      isUseTopper: z.boolean(),
       pickupTime: z.preprocess(
         (v: string) => (isNaN(parseInt(v)) ? v : BigInt(v)),
         z.bigint().positive(),
       ),
-      text: z.string(),
-      textColor: z.string(),
-      price: z.preprocess((v: string) => parseFloat(v), z.number().min(0)),
-      downPayment: z.preprocess(
-        (v: string) => parseFloat(v),
-        z.number().min(0),
-      ),
+      text: z.string().max(255),
+      textColor: z.string().max(120),
+      price: z.number().min(0),
+      downPayment: z.number().min(0),
       telp: z.string().regex(NUMBER_REGEX, 'should contains only number'),
-      notes: z.string().optional(),
-      deletedPictures: z.preprocess(
-        (v) => {
-          if (v === undefined) return [];
-          if (Array.isArray(v)) return [...new Set(v)];
-          if (typeof v === 'string') return [v];
-          return v;
-        },
-        z.array(z.string().min(5)),
-      ),
-      addedProgresses: z.preprocess((v) => {
-        if (v === undefined) return [];
-        if (Array.isArray(v)) return [...new Set(v)];
-        if (typeof v === 'string') return [v];
-        return v;
-      }, z.array(z.string().uuid())),
-      deletedProgresses: z.preprocess((v) => {
-        if (v === undefined) return [];
-        if (Array.isArray(v)) return [...new Set(v)];
-        if (typeof v === 'string') return [v];
-        return v;
-      }, z.array(z.string().uuid())),
-      addedPictures: z.array(z.any()).optional(),
+      notes: z.string().optional().nullable(),
+      deletedPictures: z.array(z.string().min(5)),
+      addedProgresses: z.array(z.string().uuid()),
+      deletedProgresses: z.array(z.string().uuid()),
+      addedPictures: z.array(z.any()).max(3),
     })
     .refine((schema) => schema.downPayment <= schema.price, {
       path: ['downPayment'],
