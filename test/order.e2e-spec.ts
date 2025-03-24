@@ -58,6 +58,7 @@ describe('OrderController (e2e)', () => {
 
   const editReq = {
     ...addReq,
+    deletedPictures: [],
     deletedProgresses: addReq.progresses,
     addedProgresses: [processes[2].id],
   };
