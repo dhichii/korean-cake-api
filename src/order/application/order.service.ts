@@ -23,7 +23,7 @@ import { IOrderRepository } from '../domain/order.repository.interface';
 import { PrismaService } from '../../common/prisma.service';
 import * as fs from 'fs';
 import { OrderValidation } from './order.validation';
-import { JsonUtil } from 'src/utils/json.util';
+import { JsonUtil } from '../../utils/json.util';
 
 @Injectable()
 export class OrderService implements IOrderService {
