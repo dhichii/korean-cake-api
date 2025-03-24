@@ -247,7 +247,6 @@ export class OrderController {
     @Body() body: EditOrderDto,
   ): Promise<StatusResponseDto> {
     body.addedPictures = files?.addedPictures ?? [];
-
     const data = await this.orderService.editById(id, userId, body);
 
     return new ApiResponseDto(data);

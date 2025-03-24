@@ -6,32 +6,23 @@ import {
 import { v4 as uuid } from 'uuid';
 import { OrderStatus } from './order.response';
 
-export class AddOrderDto {
-  @ApiProperty({
-    type: 'array',
-    items: {
-      type: 'string',
-      format: 'binary',
-    },
-  })
-  pictures: Express.Multer.File[];
-
-  @ApiProperty({ example: 16 })
+export class AddOrderDataDto {
+  @ApiProperty({ minimum: 10, description: 'must be at least 10', example: 16 })
   size: number;
 
-  @ApiProperty({ required: false, example: 2 })
+  @ApiProperty({ required: false, example: 2, nullable: true })
   layer?: number;
 
   @ApiProperty({ example: true })
   isUseTopper: boolean;
 
-  @ApiProperty({ example: 1730952000000 })
-  pickupTime: bigint;
+  @ApiProperty({ example: '1730952000000' })
+  pickupTime: string;
 
-  @ApiProperty({ example: 'Happy Birthday' })
+  @ApiProperty({ maxLength: 255, example: 'Happy Birthday' })
   text: string;
 
-  @ApiProperty({ example: 'Red' })
+  @ApiProperty({ maxLength: 120, example: 'Red' })
   textColor: string;
 
   @ApiProperty({ format: 'double', example: 20000 })
@@ -43,23 +34,42 @@ export class AddOrderDto {
   @ApiProperty({ example: '6289898888' })
   telp: string;
 
-  @ApiProperty({ required: false, example: 'call me' })
+  @ApiProperty({ required: false, example: 'call me', nullable: true })
   notes?: string;
 
-  @ApiProperty({ type: 'array', items: { type: 'string' } })
+  @ApiProperty({
+    type: [String],
+    description: 'Array of process IDs (UUIDs)',
+    example: [],
+  })
   progresses: string[];
+}
+
+export class AddOrderDto {
+  @ApiProperty({
+    type: 'array',
+    items: {
+      type: 'string',
+      format: 'binary',
+    },
+    maxItems: 3,
+  })
+  pictures: Express.Multer.File[];
+
+  @ApiProperty({ type: AddOrderDataDto })
+  data: string;
 }
 
 export const mapAddOrderDto = (
   userId: string,
-  req: AddOrderDto,
+  req: AddOrderDataDto,
 ): OrderEntity => ({
   id: uuid(),
   userId,
   size: req.size,
   layer: req.layer,
   isUseTopper: req.isUseTopper,
-  pickupTime: req.pickupTime,
+  pickupTime: BigInt(req.pickupTime),
   text: req.text,
   textColor: req.textColor,
   price: req.price,
@@ -81,23 +91,23 @@ export class GetAllOrderDto {
   status: OrderStatus;
 }
 
-export class EditOrderDto {
-  @ApiProperty({ example: 16 })
+export class EditOrderDataDto {
+  @ApiProperty({ minimum: 10, description: 'must be at least 10', example: 16 })
   size: number;
 
-  @ApiProperty({ required: false, example: 2 })
+  @ApiProperty({ required: false, example: 2, nullable: true })
   layer?: number;
 
   @ApiProperty({ example: false })
   isUseTopper: boolean;
 
-  @ApiProperty({ example: 1730952000000 })
-  pickupTime: bigint;
+  @ApiProperty({ example: '1730952000000' })
+  pickupTime: string;
 
-  @ApiProperty({ example: 'Pyy Birthday' })
+  @ApiProperty({ maxLength: 255, example: 'Pyy Birthday' })
   text: string;
 
-  @ApiProperty({ example: 'Blue' })
+  @ApiProperty({ maxLength: 120, example: 'Blue' })
   textColor: string;
 
   @ApiProperty({ format: 'double', example: 20000 })
@@ -109,9 +119,32 @@ export class EditOrderDto {
   @ApiProperty({ example: '6289898888' })
   telp: string;
 
-  @ApiProperty({ required: false, example: 'call me' })
+  @ApiProperty({ required: false, example: 'call me', nullable: true })
   notes?: string;
 
+  @ApiProperty({
+    type: [String],
+    description: 'Array of picture IDs. Can be empty.',
+    example: [],
+  })
+  deletedPictures: string[];
+
+  @ApiProperty({
+    type: [String],
+    description: 'Array of process IDs (UUIDs). Can be empty.',
+    example: [],
+  })
+  addedProgresses: string[];
+
+  @ApiProperty({
+    type: [String],
+    description: 'Array of process IDs (UUIDs). Can be empty.',
+    example: [],
+  })
+  deletedProgresses: string[];
+}
+
+export class EditOrderDto {
   @ApiProperty({
     type: 'array',
     items: {
@@ -119,24 +152,19 @@ export class EditOrderDto {
       format: 'binary',
     },
     required: false,
+    maxItems: 3,
   })
   addedPictures: Express.Multer.File[];
 
-  @ApiProperty({ type: 'array', items: { type: 'string' }, required: false })
-  deletedPictures: string[];
-
-  @ApiProperty({ type: 'array', items: { type: 'string' }, required: false })
-  addedProgresses: string[];
-
-  @ApiProperty({ type: 'array', items: { type: 'string' }, required: false })
-  deletedProgresses: string[];
+  @ApiProperty({ type: EditOrderDataDto })
+  data: string;
 }
 
-export const mapEditOrderDto = (req: EditOrderDto): EditOrderEntity => ({
+export const mapEditOrderDto = (req: EditOrderDataDto): EditOrderEntity => ({
   size: req.size,
   layer: req.layer,
   isUseTopper: req.isUseTopper,
-  pickupTime: req.pickupTime,
+  pickupTime: BigInt(req.pickupTime),
   text: req.text,
   textColor: req.textColor,
   price: req.price,

@@ -2,7 +2,9 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { GdriveService } from '../../common/gdrive.service';
 import { IOrderService } from '../domain/order.service.interface';
 import {
+  AddOrderDataDto,
   AddOrderDto,
+  EditOrderDataDto,
   EditOrderDto,
   EditOrderProgressDto,
   GetAllOrderDto,
@@ -21,6 +23,7 @@ import { IOrderRepository } from '../domain/order.repository.interface';
 import { PrismaService } from '../../common/prisma.service';
 import * as fs from 'fs';
 import { OrderValidation } from './order.validation';
+import { JsonUtil } from '../../utils/json.util';
 
 @Injectable()
 export class OrderService implements IOrderService {
@@ -34,42 +37,29 @@ export class OrderService implements IOrderService {
 
   async add(req: AddOrderDto, userId: string): Promise<AddOrderResponseDto> {
     const orderPictures: OrderPictureDto[] = [];
-    try {
-      req = this.validationService.validate(OrderValidation.ADD, req);
+    const data = JsonUtil.parse<AddOrderDataDto>(req.data);
 
-      // verify order progresses
-      await this.processService.verifyAll(req.progresses, userId);
-      // upload and mapping pictures
-      const folderId = process.env.GDRIVE_ORDER_FOLDER_ID;
-      const uploadTasks = req.pictures.map((picture) =>
-        this.gdriveService.upload(picture, folderId),
-      );
-      const uploadRes = await Promise.all(uploadTasks);
-      uploadRes.forEach((response) => {
-        orderPictures.push({
-          id: response.id,
-          url: `https://drive.google.com/uc?id=${response.id}`,
-        });
+    try {
+      this.validationService.validate(OrderValidation.ADD, {
+        pictures: req.pictures,
+        ...data,
       });
 
+      // verify order progresses
+      await this.processService.verifyAll(data.progresses, userId);
+
+      orderPictures.push(...(await this.uploadOrderPictures(req.pictures)));
+
       return await this.orderRepository.add(
-        mapAddOrderDto(userId, req),
+        mapAddOrderDto(userId, data),
         orderPictures,
-        req.progresses,
+        data.progresses,
       );
     } catch (e) {
-      await Promise.allSettled(
-        orderPictures.map((picture) => this.gdriveService.delete(picture.id)),
-      );
-
+      await this.rollbackUploadedPictures(orderPictures);
       throw e;
     } finally {
-      // remove the local file
-      if (Array.isArray(req.pictures)) {
-        await Promise.allSettled(
-          req.pictures.map((picture) => fs.promises.unlink(picture.path)),
-        );
-      }
+      await this.cleanupLocalFiles(req.pictures);
     }
   }
 
@@ -87,71 +77,42 @@ export class OrderService implements IOrderService {
 
   async editById(id: string, userId: string, req: EditOrderDto): Promise<void> {
     const newPictures: OrderPictureDto[] = [];
+    const data = JsonUtil.parse<EditOrderDataDto>(req.data);
+
     try {
-      req = this.validationService.validate(OrderValidation.EDIT_BY_ID, req);
+      this.validationService.validate(OrderValidation.EDIT_BY_ID, {
+        addedPictures: req.addedPictures,
+        ...data,
+      });
 
       // verify order and order progresses
       await this.orderRepository.verify(id, userId);
-      await this.processService.verifyAll(req.addedProgresses, userId);
+      await this.processService.verifyAll(data.addedProgresses, userId);
 
       // verify if processes already exist. if exist, remove from request
-      const progressVerifications = req.addedProgresses.map(
-        async (progressId, index) => {
-          try {
-            await this.orderRepository.verifyProgress(progressId, id);
-            req.addedProgresses.splice(index, 1);
-          } catch (e) {
-            if (!(e instanceof NotFoundException)) {
-              throw e;
-            }
-          }
-        },
+      data.addedProgresses = await this.filterExistingProgresses(
+        data.addedProgresses,
+        id,
       );
-      await Promise.all(progressVerifications);
 
-      // upload and mapping pictures
-      for (const picture of req.addedPictures) {
-        const response = await this.gdriveService.upload(
-          picture,
-          process.env.GDRIVE_ORDER_FOLDER_ID,
-        );
-
-        newPictures.push({
-          id: response.id,
-          url: `https://drive.google.com/uc?id=${response.id}`,
-        });
-      }
+      newPictures.push(...(await this.uploadOrderPictures(req.addedPictures)));
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       await this.prismaService.$transaction(async (tx) => {
-        await this.orderRepository.addProgresses(id, req.addedProgresses);
-        await this.orderRepository.deleteProgresses(id, req.deletedProgresses);
+        await this.orderRepository.addProgresses(id, data.addedProgresses);
+        await this.orderRepository.deleteProgresses(id, data.deletedProgresses);
         await this.orderRepository.editById(
           id,
-          mapEditOrderDto(req),
+          mapEditOrderDto(data),
           newPictures,
         );
-        for (const pictureId of req.deletedPictures) {
-          try {
-            await this.gdriveService.delete(pictureId);
-          } catch (e) {
-            if (!e.message.includes('File not found')) {
-              throw e;
-            }
-          }
-        }
+        await this.deleteRemovedPictures(data.deletedPictures);
       });
     } catch (e) {
-      await Promise.allSettled(
-        newPictures.map((picture) => this.gdriveService.delete(picture.id)),
-      );
-
+      await this.rollbackUploadedPictures(newPictures);
       throw e;
     } finally {
-      // remove the local file
-      await Promise.allSettled(
-        req.addedPictures.map((picture) => fs.promises.unlink(picture.path)),
-      );
+      await this.cleanupLocalFiles(req.addedPictures);
     }
   }
 
@@ -171,15 +132,80 @@ export class OrderService implements IOrderService {
     userId: string,
     req: EditOrderProgressDto,
   ): Promise<void> {
-    req = this.validationService.validate(
-      OrderValidation.EDIT_PROGRESS_BY_ID,
-      req,
-    );
+    this.validationService.validate(OrderValidation.EDIT_PROGRESS_BY_ID, req);
 
     // verify the order with userId
     await this.orderRepository.verify(orderId, userId);
     // verify if the order progress exist
     await this.orderRepository.verifyProgress(id, orderId);
     await this.orderRepository.editProgressById(id, orderId, req.isFinish);
+  }
+
+  private async uploadOrderPictures(
+    pictures: Express.Multer.File[],
+  ): Promise<OrderPictureDto[]> {
+    const folderId = process.env.GDRIVE_ORDER_FOLDER_ID;
+    const uploadTasks = pictures.map((picture) =>
+      this.gdriveService.upload(picture, folderId),
+    );
+
+    const uploadRes = await Promise.all(uploadTasks);
+    return uploadRes.map((response) => ({
+      id: response.id,
+      url: `https://drive.google.com/uc?id=${response.id}`,
+    }));
+  }
+
+  private async rollbackUploadedPictures(
+    pictures: OrderPictureDto[],
+  ): Promise<void> {
+    await Promise.allSettled(
+      pictures.map((picture) => this.gdriveService.delete(picture.id)),
+    );
+  }
+
+  private async cleanupLocalFiles(
+    pictures: Express.Multer.File[],
+  ): Promise<void> {
+    if (Array.isArray(pictures)) {
+      await Promise.allSettled(
+        pictures.map((picture) => fs.promises.unlink(picture.path)),
+      );
+    }
+  }
+
+  private async filterExistingProgresses(
+    progresses: string[],
+    orderId: string,
+  ): Promise<string[]> {
+    const validProgresses: string[] = [];
+
+    await Promise.all(
+      progresses.map(async (progressId) => {
+        try {
+          await this.orderRepository.verifyProgress(progressId, orderId);
+        } catch (e) {
+          if (e instanceof NotFoundException) {
+            validProgresses.push(progressId);
+          } else {
+            throw e;
+          }
+        }
+      }),
+    );
+
+    return validProgresses;
+  }
+
+  private async deleteRemovedPictures(pictureIds: string[]): Promise<void> {
+    for (const pictureId of pictureIds) {
+      try {
+        await this.gdriveService.delete(pictureId);
+      } catch (e) {
+        if (!e.message.includes('File not found')) {
+          throw e;
+        }
+      }
+    }
   }
 }

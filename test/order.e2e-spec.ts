@@ -58,6 +58,7 @@ describe('OrderController (e2e)', () => {
 
   const editReq = {
     ...addReq,
+    deletedPictures: [],
     deletedProgresses: addReq.progresses,
     addedProgresses: [processes[2].id],
   };
@@ -138,7 +139,7 @@ describe('OrderController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/orders')
         .set('Authorization', `Bearer ${accessToken}`)
-        .field({ notes: addReq.notes });
+        .field({ data: JSON.stringify({ notes: addReq.notes }) });
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
@@ -158,7 +159,7 @@ describe('OrderController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/orders')
         .set('Authorization', `Bearer ${accessToken}`)
-        .field(addReq)
+        .field({ data: JSON.stringify(addReq) })
         .attach('pictures', filePath);
 
       const body = response.body;
@@ -263,7 +264,7 @@ describe('OrderController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .put(`/api/v1/orders/${orderId}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .field({ notes: addReq.notes });
+        .field({ data: JSON.stringify({ notes: addReq.notes }) });
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
@@ -281,7 +282,7 @@ describe('OrderController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .put(`/api/v1/orders/${orderId}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .field(editReq);
+        .field({ data: JSON.stringify(editReq) });
 
       expect(response.status).toEqual(200);
       expect(response.body.status).toEqual('success');
