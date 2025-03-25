@@ -1,6 +1,5 @@
 import {
   ExecutionContext,
-  forwardRef,
   Inject,
   Injectable,
   UnauthorizedException,
@@ -12,7 +11,7 @@ import { JWTSignPayload } from '../interface/http/auth.response';
 @Injectable()
 export class RefreshJwtGuard extends AuthGuard('jwt-refresh') {
   constructor(
-    @Inject(forwardRef(() => 'IUserService'))
+    @Inject('IUserService')
     private usersService: IUserService,
   ) {
     super();

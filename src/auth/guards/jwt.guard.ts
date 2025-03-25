@@ -1,6 +1,5 @@
 import {
   ExecutionContext,
-  forwardRef,
   Inject,
   Injectable,
   UnauthorizedException,
@@ -12,7 +11,7 @@ import { IUserService } from '../../user/domain/user.service.interface';
 @Injectable()
 export class JwtGuard extends AuthGuard('jwt') {
   constructor(
-    @Inject(forwardRef(() => 'IUserService'))
+    @Inject('IUserService')
     private usersService: IUserService,
   ) {
     super();
