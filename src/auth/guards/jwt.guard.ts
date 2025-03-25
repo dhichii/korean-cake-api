@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { JWTSignPayload } from '../interface/http/auth.response';
-import { IUserService } from 'src/user/domain/user.service.interface';
+import { IUserService } from '../../user/domain/user.service.interface';
 
 @Injectable()
 export class JwtGuard extends AuthGuard('jwt') {
