@@ -6,15 +6,14 @@ import {
 } from '../interface/http/user.request';
 import {
   UserResponseDto,
-  UserWithPasswordResponseDto,
+  UserFullResponseDto,
 } from '../interface/http/user.response';
-import { TokenResponse } from '../../auth/interface/http/auth.response';
 
 export interface IUserService {
   add(req: AddUserDto): Promise<{ id: string }>;
   getAll(role?: Role): Promise<UserResponseDto[]>;
   getById(id: string): Promise<UserResponseDto>;
-  getByUsername(username: string): Promise<UserWithPasswordResponseDto>;
+  getByUsername(username: string): Promise<UserFullResponseDto>;
   editProfileById(id: string, data: EditUserProfileDto): Promise<void>;
   deleteById(id: string): Promise<void>;
   changeEmail(

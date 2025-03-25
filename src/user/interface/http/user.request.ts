@@ -12,7 +12,9 @@ export class AddUserDto {
   role?: Role;
 }
 
-export async function mapAddUserDto(req: AddUserDto): Promise<UserEntity> {
+export async function mapAddUserDto(
+  req: AddUserDto,
+): Promise<Omit<UserEntity, 'tokenVersion'>> {
   const password = await new Bcrypt().hash(req.password);
 
   return {

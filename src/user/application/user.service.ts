@@ -13,7 +13,7 @@ import {
 } from '../interface/http/user.request';
 import {
   UserResponseDto,
-  UserWithPasswordResponseDto,
+  UserFullResponseDto,
 } from '../interface/http/user.response';
 import { IUserService } from '../domain/user.service.interface';
 import { Bcrypt } from '../../utils/Bcrypt';
@@ -75,7 +75,7 @@ export class UserService implements IUserService {
     };
   }
 
-  async getByUsername(username: string): Promise<UserWithPasswordResponseDto> {
+  async getByUsername(username: string): Promise<UserFullResponseDto> {
     this.validationService.validate(UserValidation.GET_BY_USERNAME, username);
 
     const data = await this.userRepository.getByUsername(username);
@@ -86,6 +86,7 @@ export class UserService implements IUserService {
       username: data.username,
       email: data.email,
       role: data.role,
+      tokenVersion: data.tokenVersion,
       password: data.password,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,

@@ -7,6 +7,7 @@ export type UserEntity = {
   email: string;
   password: string;
   role: Role;
+  tokenVersion?: number;
   createdAt?: Date;
   updatedAt?: Date;
 };

@@ -24,13 +24,14 @@ export class UserResponseDto {
   updatedAt: Date;
 }
 
-export class UserWithPasswordResponseDto {
+export class UserFullResponseDto {
   id: string;
   name: string;
   username: string;
   email: string;
   role: Role;
   password: string;
+  tokenVersion: number;
   createdAt: Date;
   updatedAt: Date;
 }
