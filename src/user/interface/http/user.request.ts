@@ -32,6 +32,22 @@ export class EditUserProfileDto {
   name: string;
 }
 
+export class ChangeEmailDto {
+  @ApiProperty({ example: 'verystrongpassword' })
+  password: string;
+
+  @ApiProperty({ example: 'example' })
+  email: string;
+}
+
+export class ChangeUsernameDto {
+  @ApiProperty({ example: 'verystrongpassword' })
+  password: string;
+
+  @ApiProperty({ example: 'example' })
+  username: string;
+}
+
 export class ChangeUserPasswordDto {
   @ApiProperty({ example: 'verystrongpassword' })
   oldPassword: string;
