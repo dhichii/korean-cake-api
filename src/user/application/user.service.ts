@@ -7,13 +7,15 @@ import {
 import { IUserRepository } from '../domain/user.repository.interface';
 import {
   AddUserDto,
+  ChangeEmailDto,
+  ChangeUsernameDto,
   ChangeUserPasswordDto,
   EditUserProfileDto,
   mapAddUserDto,
 } from '../interface/http/user.request';
 import {
   UserResponseDto,
-  UserWithPasswordResponseDto,
+  UserFullResponseDto,
 } from '../interface/http/user.response';
 import { IUserService } from '../domain/user.service.interface';
 import { Bcrypt } from '../../utils/Bcrypt';
@@ -22,7 +24,6 @@ import { UserValidation } from './user.validation';
 import { Role } from '@prisma/client';
 import { IAuthService } from '../../auth/domain/auth.service.interface';
 import { PrismaService } from '../../common/prisma.service';
-import { TokenResponse } from '../../auth/interface/http/auth.response';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -75,7 +76,7 @@ export class UserService implements IUserService {
     };
   }
 
-  async getByUsername(username: string): Promise<UserWithPasswordResponseDto> {
+  async getByUsername(username: string): Promise<UserFullResponseDto> {
     this.validationService.validate(UserValidation.GET_BY_USERNAME, username);
 
     const data = await this.userRepository.getByUsername(username);
@@ -86,6 +87,7 @@ export class UserService implements IUserService {
       username: data.username,
       email: data.email,
       role: data.role,
+      tokenVersion: data.tokenVersion,
       password: data.password,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
@@ -109,54 +111,37 @@ export class UserService implements IUserService {
     await this.userRepository.deleteById(id);
   }
 
-  async changeEmail(
-    id: string,
-    refreshToken: string,
-    email: string,
-  ): Promise<TokenResponse> {
-    this.validationService.validate(UserValidation.CHANGE_EMAIL, { id, email });
+  async changeEmail(id: string, req: ChangeEmailDto): Promise<void> {
+    this.validationService.validate(UserValidation.CHANGE_EMAIL, {
+      id,
+      ...req,
+    });
 
-    // verify the refresh token
-    await this.authService.get(refreshToken);
-
-    const user = await this.getById(id);
+    await this.isPasswordMatch(req.password, id);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return await this.prismaService.$transaction(async (tx) => {
+    await this.prismaService.$transaction(async (tx) => {
       Promise.all([
-        this.userRepository.changeEmail(id, email),
+        this.userRepository.changeEmail(id, req.email),
         this.authService.revokeAllByUserId(id),
       ]);
-
-      // return new access and refresh token
-      return await this.authService.login({ ...user, email });
     });
   }
 
-  async changeUsername(
-    id: string,
-    refreshToken: string,
-    username: string,
-  ): Promise<TokenResponse> {
+  async changeUsername(id: string, req: ChangeUsernameDto): Promise<void> {
     this.validationService.validate(UserValidation.CHANGE_USERNAME, {
       id,
-      username,
+      ...req,
     });
 
-    // verify the refresh token
-    await this.authService.get(refreshToken);
-
-    const user = await this.getById(id);
+    await this.isPasswordMatch(req.password, id);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return await this.prismaService.$transaction(async (tx) => {
+    await this.prismaService.$transaction(async (tx) => {
       Promise.all([
-        this.userRepository.changeUsername(id, username),
+        this.userRepository.changeUsername(id, req.username),
         this.authService.revokeAllByUserId(id),
       ]);
-
-      // return new access and refresh token
-      return await this.authService.login({ ...user, username });
     });
   }
 
@@ -170,13 +155,7 @@ export class UserService implements IUserService {
     const { password: hashedPassword } = await this.userRepository.getById(id);
 
     // check if the old password is correct
-    const isOldPasswordCorrect = await bcrypt.compare(
-      req.oldPassword,
-      hashedPassword,
-    );
-    if (!isOldPasswordCorrect) {
-      throw new BadRequestException('old password incorrect');
-    }
+    await this.isPasswordMatch(req.oldPassword, id, 'old password incorrect');
 
     // prevent using the same password
     const isSamePassword = await bcrypt.compare(
@@ -200,5 +179,19 @@ export class UserService implements IUserService {
         this.authService.revokeAllByUserId(id),
       ]),
     );
+  }
+
+  private async isPasswordMatch(
+    password: string,
+    userId: string,
+    errorMessage: string = 'password incorrect',
+  ) {
+    const bcrypt = new Bcrypt();
+    const { password: hashedPassword } =
+      await this.userRepository.getById(userId);
+    const isMatch = await bcrypt.compare(password, hashedPassword);
+    if (!isMatch) {
+      throw new BadRequestException(errorMessage);
+    }
   }
 }

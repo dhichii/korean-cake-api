@@ -13,6 +13,7 @@ export type JWTSignPayload = {
   username: string;
   email: string;
   role: Role;
+  tokenVersion: number;
   createdAt?: Date;
   updatedAt?: Date;
 };

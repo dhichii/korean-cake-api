@@ -10,7 +10,6 @@ import {
   Put,
   Req,
   Res,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
@@ -24,11 +23,7 @@ import {
   ValidationErrorResponse,
 } from '../../../common/api-response.dto';
 import { IUserService } from '../../../user/domain/user.service.interface';
-import {
-  ChangeEmailResponseDto,
-  ChangeUsernameResponseDto,
-  UserResponseDto,
-} from './user.response';
+import { UserResponseDto } from './user.response';
 import { JWTSignPayload } from '../../../auth/interface/http/auth.response';
 import { RolesGuard } from '../../../common/roles.guard';
 import { Role } from '@prisma/client';
@@ -45,16 +40,16 @@ import {
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { ChangeUserPasswordDto, EditUserProfileDto } from './user.request';
+import {
+  ChangeEmailDto,
+  ChangeUsernameDto,
+  ChangeUserPasswordDto,
+  EditUserProfileDto,
+} from './user.request';
 import { User } from '../../../common/decorator/user.decorator';
 
 @Controller('/api/v1/users')
-@ApiExtraModels(
-  ApiResponseDto,
-  UserResponseDto,
-  ChangeEmailResponseDto,
-  ChangeUsernameResponseDto,
-)
+@ApiExtraModels(ApiResponseDto, UserResponseDto)
 export class UserController {
   constructor(@Inject('IUserService') private userService: IUserService) {}
 
@@ -195,33 +190,11 @@ export class UserController {
   @Patch('email')
   @HttpCode(200)
   @UseGuards(JwtGuard)
-  @ApiOperation({ summary: 'change email and set refresh cookie' })
+  @ApiOperation({ summary: 'change email and clear refresh cookie' })
   @ApiBearerAuth('Authorization')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        email: {
-          type: 'string',
-          example: 'example',
-        },
-      },
-    },
-  })
   @ApiOkResponse({
     description: 'Successfully change email',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(ApiResponseDto) },
-        {
-          properties: {
-            data: {
-              $ref: getSchemaPath(ChangeEmailResponseDto),
-            },
-          },
-        },
-      ],
-    },
+    type: StatusResponseDto,
   })
   @ApiBadRequestResponse({
     description: 'Validation Error',
@@ -236,58 +209,25 @@ export class UserController {
     type: InternalServerResponse,
   })
   async changeEmail(
-    @Req() req: Request,
+    @User('id') id: string,
+    @Body() body: ChangeEmailDto,
     @Res() res: Response,
-  ): Promise<Response<ApiResponseDto<ChangeEmailResponseDto>>> {
-    const user = req.user as JWTSignPayload;
-    const refreshToken = req.cookies['refresh'];
-    if (!refreshToken) {
-      throw new UnauthorizedException();
-    }
-
-    const email = req.body.email;
-
-    const { access, refresh, exp } = await this.userService.changeEmail(
-      user.id,
-      refreshToken,
-      email,
-    );
+  ): Promise<Response<StatusResponseDto>> {
+    await this.userService.changeEmail(id, body);
 
     return res
-      .cookie('refresh', refresh, createAuthCookieOpts(exp))
-      .json(new ApiResponseDto<ChangeEmailResponseDto>({ access }));
+      .clearCookie('refresh', createAuthCookieOpts())
+      .json(new StatusResponseDto());
   }
 
   @Patch('username')
   @HttpCode(200)
   @UseGuards(JwtGuard)
-  @ApiOperation({ summary: 'change username and set refresh cookie' })
+  @ApiOperation({ summary: 'change username and clear refresh cookie' })
   @ApiBearerAuth('Authorization')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        username: {
-          type: 'string',
-          example: 'example',
-        },
-      },
-    },
-  })
   @ApiOkResponse({
     description: 'Successfully change username',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(ApiResponseDto) },
-        {
-          properties: {
-            data: {
-              $ref: getSchemaPath(ChangeUsernameResponseDto),
-            },
-          },
-        },
-      ],
-    },
+    type: StatusResponseDto,
   })
   @ApiBadRequestResponse({
     description: 'Validation Error',
@@ -302,32 +242,21 @@ export class UserController {
     type: InternalServerResponse,
   })
   async changeUsername(
-    @Req() req: Request,
+    @User('id') id: string,
+    @Body() body: ChangeUsernameDto,
     @Res() res: Response,
-  ): Promise<Response<ApiResponseDto<ChangeEmailResponseDto>>> {
-    const user = req.user as JWTSignPayload;
-    const refreshToken = req.cookies['refresh'];
-    if (!refreshToken) {
-      throw new UnauthorizedException();
-    }
-
-    const username = req.body.username;
-
-    const { access, refresh, exp } = await this.userService.changeUsername(
-      user.id,
-      refreshToken,
-      username,
-    );
+  ): Promise<Response<StatusResponseDto>> {
+    await this.userService.changeUsername(id, body);
 
     return res
-      .cookie('refresh', refresh, createAuthCookieOpts(exp))
-      .json(new ApiResponseDto<ChangeEmailResponseDto>({ access }));
+      .clearCookie('refresh', createAuthCookieOpts())
+      .json(new StatusResponseDto());
   }
 
   @Patch('password')
   @HttpCode(200)
   @UseGuards(JwtGuard)
-  @ApiOperation({ summary: 'change password' })
+  @ApiOperation({ summary: 'change password and clear refresh cookie' })
   @ApiBearerAuth('Authorization')
   @ApiOkResponse({
     description: 'Successfully change password',
@@ -348,9 +277,12 @@ export class UserController {
   async changePassword(
     @User('id') id: string,
     @Body() body: ChangeUserPasswordDto,
-  ): Promise<StatusResponseDto> {
+    @Res() res: Response,
+  ): Promise<Response<StatusResponseDto>> {
     await this.userService.changePassword(id, body);
 
-    return new StatusResponseDto();
+    return res
+      .clearCookie('refresh', createAuthCookieOpts())
+      .json(new StatusResponseDto());
   }
 }

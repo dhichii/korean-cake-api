@@ -30,11 +30,13 @@ export class UserValidation {
 
   static readonly CHANGE_EMAIL: ZodType = z.object({
     id: z.string().uuid(),
+    password: z.string().min(8),
     email: z.string().email(),
   });
 
   static readonly CHANGE_USERNAME: ZodType = z.object({
     id: z.string().uuid(),
+    password: z.string().min(8),
     username: z
       .string()
       .min(3)

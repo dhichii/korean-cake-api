@@ -8,6 +8,7 @@ import { ProcessController } from '../src/process/interface/http/process.control
 import { ProcessRepository } from '../src/process/infrastructure/process.repository';
 import { ProcessService } from '../src/process/application/process.service';
 import { AuthModule } from '../src/auth/auth.module';
+import { UserModule } from '../src/user/user.module';
 
 describe('ProcessController (e2e)', () => {
   let app: INestApplication;
@@ -30,7 +31,7 @@ describe('ProcessController (e2e)', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [CommonModule, AuthModule],
+      imports: [CommonModule, UserModule, AuthModule],
       controllers: [ProcessController],
       providers: [
         {

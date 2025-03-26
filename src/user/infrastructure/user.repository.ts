@@ -50,15 +50,24 @@ export class UserRepository implements IUserRepository {
   }
 
   async changeEmail(id: string, email: string): Promise<void> {
-    await this.db.user.update({ where: { id }, data: { email } });
+    await this.db.user.update({
+      where: { id },
+      data: { email, tokenVersion: { increment: 1 } },
+    });
   }
 
   async changeUsername(id: string, username: string): Promise<void> {
-    await this.db.user.update({ where: { id }, data: { username } });
+    await this.db.user.update({
+      where: { id },
+      data: { username, tokenVersion: { increment: 1 } },
+    });
   }
 
   async changePassword(id: string, password: string): Promise<void> {
-    await this.db.user.update({ where: { id }, data: { password } });
+    await this.db.user.update({
+      where: { id },
+      data: { password, tokenVersion: { increment: 1 } },
+    });
   }
 
   async deleteById(id: string): Promise<void> {

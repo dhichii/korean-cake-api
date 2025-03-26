@@ -1,15 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { forwardRef, INestApplication } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { CommonModule } from '../src/common/common.module';
 import { PrismaClient, Role } from '@prisma/client';
 import * as cookieParser from 'cookie-parser';
 import { AuthModule } from '../src/auth/auth.module';
-import { UserRepository } from '../src/user/infrastructure/user.repository';
-import { UserController } from '../src/user/interface/http/user.controller';
-import { UserService } from '../src/user/application/user.service';
 import { v4 as uuid } from 'uuid';
 import { Bcrypt } from '../src/utils/Bcrypt';
+import { UserModule } from '../src/user/user.module';
 
 describe('UserController (e2e)', () => {
   let app: INestApplication;
@@ -19,7 +17,6 @@ describe('UserController (e2e)', () => {
   let userAccess: string;
 
   let adminAccess: string;
-  let adminRefresh: string;
 
   const user = {
     name: 'user e2e test',
@@ -36,20 +33,20 @@ describe('UserController (e2e)', () => {
     password: 'admine2etest',
   };
 
+  async function login(req: {
+    username: string;
+    password: string;
+  }): Promise<string> {
+    const response = await request(app.getHttpServer())
+      .post('/api/v1/auth/login')
+      .send(req);
+
+    return response.body.data.access;
+  }
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [CommonModule, forwardRef(() => AuthModule)],
-      controllers: [UserController],
-      providers: [
-        {
-          provide: 'IUserRepository',
-          useClass: UserRepository,
-        },
-        {
-          provide: 'IUserService',
-          useClass: UserService,
-        },
-      ],
+      imports: [CommonModule, UserModule, AuthModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -57,11 +54,7 @@ describe('UserController (e2e)', () => {
     await app.init();
 
     await request(app.getHttpServer()).post('/api/v1/auth/register').send(user);
-    const userResponse = await request(app.getHttpServer())
-      .post('/api/v1/auth/login')
-      .send(user);
-
-    userAccess = userResponse.body.data.access;
+    userAccess = await login(user);
 
     const password = await new Bcrypt().hash(admin.password);
     await prismaClient.user.create({
@@ -71,14 +64,8 @@ describe('UserController (e2e)', () => {
         password,
       },
     });
-    const adminResponse = await request(app.getHttpServer())
-      .post('/api/v1/auth/login')
-      .send(admin);
 
-    adminAccess = adminResponse.body.data.access;
-    adminRefresh = adminResponse.header['set-cookie'][0]
-      .split(';')[0]
-      .split('refresh=')[1];
+    adminAccess = await login(admin);
   });
 
   afterAll(async () => {
@@ -225,34 +212,41 @@ describe('UserController (e2e)', () => {
     it('should return 400 when request invalid', async () => {
       const response = await request(app.getHttpServer())
         .patch('/api/v1/users/email')
-        .set('Authorization', `Bearer ${adminAccess}`)
-        .set('Cookie', [`refresh=${adminRefresh}`]);
+        .set('Authorization', `Bearer ${adminAccess}`);
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].path).toEqual('email');
+      expect(errors[0].path).toEqual('password');
+      expect(errors[1].path).toEqual('email');
     });
 
     it('should change email successfully', async () => {
-      // delay for 1s to avoid duplicate token being generated
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       const response = await request(app.getHttpServer())
         .patch('/api/v1/users/email')
         .set('Authorization', `Bearer ${adminAccess}`)
-        .set('Cookie', [`refresh=${adminRefresh}`])
         .send(admin);
 
       const body = response.body;
       const refreshCookie = response.header['set-cookie'][0];
       expect(response.status).toEqual(200);
-      expect(refreshCookie).toContain('refresh');
-      expect(refreshCookie).toContain('HttpOnly');
-      expect(refreshCookie).toContain('SameSite=Strict');
+      expect(refreshCookie).toContain('refresh=');
+      expect(refreshCookie).toContain('Expires=Thu, 01 Jan 1970 00:00:00 GMT');
       expect(body.status).toEqual('success');
-      expect(body.data.access).toBeDefined();
+    });
 
-      adminRefresh = refreshCookie.split(';')[0].split('refresh=')[1];
+    it('should invalidate old tokens after updating email', async () => {
+      // delay request to ensure access token is invalidated
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const response = await request(app.getHttpServer())
+        .patch('/api/v1/users/email')
+        .set('Authorization', `Bearer ${adminAccess}`)
+        .send(admin);
+
+      expect(response.status).toEqual(401);
+      expect(response.body.message).toEqual(
+        'token expired, please log in again.',
+      );
     });
   });
 
@@ -266,33 +260,42 @@ describe('UserController (e2e)', () => {
     });
 
     it('should return 400 when request invalid', async () => {
+      adminAccess = await login(admin);
+
       const response = await request(app.getHttpServer())
         .patch('/api/v1/users/username')
-        .set('Authorization', `Bearer ${adminAccess}`)
-        .set('Cookie', [`refresh=${adminRefresh}`]);
+        .set('Authorization', `Bearer ${adminAccess}`);
 
       const errors = response.body.errors;
       expect(response.status).toEqual(400);
-      expect(errors[0].path).toEqual('username');
+      expect(errors[0].path).toEqual('password');
+      expect(errors[1].path).toEqual('username');
     });
 
     it('should change username successfully', async () => {
       const response = await request(app.getHttpServer())
         .patch('/api/v1/users/username')
         .set('Authorization', `Bearer ${adminAccess}`)
-        .set('Cookie', [`refresh=${adminRefresh}`])
         .send(admin);
 
       const body = response.body;
       const refreshCookie = response.header['set-cookie'][0];
       expect(response.status).toEqual(200);
-      expect(refreshCookie).toContain('refresh');
-      expect(refreshCookie).toContain('HttpOnly');
-      expect(refreshCookie).toContain('SameSite=Strict');
+      expect(refreshCookie).toContain('refresh=');
+      expect(refreshCookie).toContain('Expires=Thu, 01 Jan 1970 00:00:00 GMT');
       expect(body.status).toEqual('success');
-      expect(body.data.access).toBeDefined();
+    });
 
-      adminRefresh = refreshCookie.split(';')[0].split('refresh=')[1];
+    it('should invalidate old tokens after updating username', async () => {
+      const response = await request(app.getHttpServer())
+        .patch('/api/v1/users/username')
+        .set('Authorization', `Bearer ${adminAccess}`)
+        .send(admin);
+
+      expect(response.status).toEqual(401);
+      expect(response.body.message).toEqual(
+        'token expired, please log in again.',
+      );
     });
   });
 
@@ -319,6 +322,8 @@ describe('UserController (e2e)', () => {
     });
 
     it('should return 400 when request invalid', async () => {
+      adminAccess = await login(admin);
+
       const response = await request(app.getHttpServer())
         .patch('/api/v1/users/password')
         .set('Authorization', `Bearer ${adminAccess}`);
@@ -357,8 +362,23 @@ describe('UserController (e2e)', () => {
         .set('Authorization', `Bearer ${adminAccess}`)
         .send(validRequest);
 
+      const refreshCookie = response.header['set-cookie'][0];
       expect(response.status).toEqual(200);
+      expect(refreshCookie).toContain('refresh=');
+      expect(refreshCookie).toContain('Expires=Thu, 01 Jan 1970 00:00:00 GMT');
       expect(response.body.status).toEqual('success');
+    });
+
+    it('should invalidate old tokens after updating password', async () => {
+      const response = await request(app.getHttpServer())
+        .patch('/api/v1/users/password')
+        .set('Authorization', `Bearer ${adminAccess}`)
+        .send(validRequest);
+
+      expect(response.status).toEqual(401);
+      expect(response.body.message).toEqual(
+        'token expired, please log in again.',
+      );
     });
   });
 });

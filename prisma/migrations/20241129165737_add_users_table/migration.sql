@@ -9,6 +9,7 @@ CREATE TABLE "users" (
     "email" VARCHAR(120) NOT NULL,
     "password" VARCHAR(255) NOT NULL,
     "role" "Role" NOT NULL,
+    "tokenVersion" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),

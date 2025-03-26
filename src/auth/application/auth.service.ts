@@ -1,5 +1,4 @@
 import {
-  forwardRef,
   HttpException,
   Inject,
   Injectable,
@@ -22,7 +21,7 @@ import { AuthEntity } from '../domain/auth.entity';
 export class AuthService implements IAuthService {
   constructor(
     @Inject('IAuthRepository') private authRepository: IAuthRepository,
-    @Inject(forwardRef(() => 'IUserService')) private userService: IUserService,
+    @Inject('IUserService') private userService: IUserService,
     private validationService: ValidationService,
     private jwtService: JwtService,
     private prismaService: PrismaService,

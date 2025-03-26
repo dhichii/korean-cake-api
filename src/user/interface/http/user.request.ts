@@ -12,7 +12,9 @@ export class AddUserDto {
   role?: Role;
 }
 
-export async function mapAddUserDto(req: AddUserDto): Promise<UserEntity> {
+export async function mapAddUserDto(
+  req: AddUserDto,
+): Promise<Omit<UserEntity, 'tokenVersion'>> {
   const password = await new Bcrypt().hash(req.password);
 
   return {
@@ -28,6 +30,22 @@ export async function mapAddUserDto(req: AddUserDto): Promise<UserEntity> {
 export class EditUserProfileDto {
   @ApiProperty({ example: 'example' })
   name: string;
+}
+
+export class ChangeEmailDto {
+  @ApiProperty({ example: 'verystrongpassword' })
+  password: string;
+
+  @ApiProperty({ example: 'example' })
+  email: string;
+}
+
+export class ChangeUsernameDto {
+  @ApiProperty({ example: 'verystrongpassword' })
+  password: string;
+
+  @ApiProperty({ example: 'example' })
+  username: string;
 }
 
 export class ChangeUserPasswordDto {

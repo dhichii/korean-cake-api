@@ -9,10 +9,12 @@ import * as cookieParser from 'cookie-parser';
 import { AdminController } from '../src/admin/interface/http/admin.controller';
 import { AdminService } from '../src/admin/application/admin.service';
 import { AuthModule } from '../src/auth/auth.module';
-import { JwtService } from '@nestjs/jwt';
+import { Bcrypt } from '../src/utils/Bcrypt';
+import { v4 as uuid } from 'uuid';
 
 describe('AdminController (e2e)', () => {
   let app: INestApplication;
+  const prismaClient = new PrismaClient();
 
   let adminId: string;
 
@@ -20,13 +22,15 @@ describe('AdminController (e2e)', () => {
     name: 'example',
     username: 'example',
     email: 'example@gmail.com',
-    role: Role.USER,
+    password: 'verystrongpassword',
   };
 
   const validUser = {
-    username: process.env.SUPER_USERNAME,
-    password: process.env.SUPER_PASSWORD,
-    role: Role.SUPER,
+    id: uuid(),
+    name: process.env.SUPER_NAME + 'test',
+    username: process.env.SUPER_USERNAME + 'test',
+    email: process.env.SUPER_EMAIL + 'test',
+    password: process.env.SUPER_PASSWORD + 'test',
   };
 
   const adminUser = {
@@ -35,12 +39,8 @@ describe('AdminController (e2e)', () => {
     email: 'admin1@gmail.com',
   };
 
-  const validToken = new JwtService().sign(validUser, {
-    secret: process.env.ACCESS_TOKEN_KEY,
-  });
-  const forbiddenToken = new JwtService().sign(forbiddenUser, {
-    secret: process.env.ACCESS_TOKEN_KEY,
-  });
+  let validToken: string;
+  let forbiddenToken: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -58,10 +58,33 @@ describe('AdminController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     app.use(cookieParser());
     await app.init();
+
+    await request(app.getHttpServer())
+      .post('/api/v1/auth/register')
+      .send(forbiddenUser);
+    const forbiddenUserResponse = await request(app.getHttpServer())
+      .post('/api/v1/auth/login')
+      .send(forbiddenUser);
+
+    forbiddenToken = forbiddenUserResponse.body.data.access;
+
+    await prismaClient.user.create({
+      data: {
+        ...validUser,
+        password: await new Bcrypt().hash(validUser.password),
+        role: Role.SUPER,
+      },
+    });
+
+    const validUserResponse = await request(app.getHttpServer())
+      .post('/api/v1/auth/login')
+      .send(validUser);
+
+    validToken = validUserResponse.body.data.access;
   });
 
   afterAll(async () => {
-    await new PrismaClient().user.deleteMany();
+    await prismaClient.user.deleteMany();
   });
 
   describe('POST /api/v1/admin', () => {
