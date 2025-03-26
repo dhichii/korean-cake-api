@@ -221,9 +221,6 @@ describe('UserController (e2e)', () => {
     });
 
     it('should change email successfully', async () => {
-      // delay for 1s to avoid duplicate token being generated
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       const response = await request(app.getHttpServer())
         .patch('/api/v1/users/email')
         .set('Authorization', `Bearer ${adminAccess}`)
@@ -238,6 +235,9 @@ describe('UserController (e2e)', () => {
     });
 
     it('should invalidate old tokens after updating email', async () => {
+      // delay request to ensure access token is invalidated
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const response = await request(app.getHttpServer())
         .patch('/api/v1/users/email')
         .set('Authorization', `Bearer ${adminAccess}`)
