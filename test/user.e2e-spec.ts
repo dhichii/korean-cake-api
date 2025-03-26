@@ -1,15 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { forwardRef, INestApplication } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { CommonModule } from '../src/common/common.module';
 import { PrismaClient, Role } from '@prisma/client';
 import * as cookieParser from 'cookie-parser';
 import { AuthModule } from '../src/auth/auth.module';
-import { UserRepository } from '../src/user/infrastructure/user.repository';
-import { UserController } from '../src/user/interface/http/user.controller';
-import { UserService } from '../src/user/application/user.service';
 import { v4 as uuid } from 'uuid';
 import { Bcrypt } from '../src/utils/Bcrypt';
+import { UserModule } from '../src/user/user.module';
 
 describe('UserController (e2e)', () => {
   let app: INestApplication;
@@ -48,18 +46,7 @@ describe('UserController (e2e)', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [CommonModule, forwardRef(() => AuthModule)],
-      controllers: [UserController],
-      providers: [
-        {
-          provide: 'IUserRepository',
-          useClass: UserRepository,
-        },
-        {
-          provide: 'IUserService',
-          useClass: UserService,
-        },
-      ],
+      imports: [CommonModule, UserModule, AuthModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();

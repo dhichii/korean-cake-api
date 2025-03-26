@@ -16,6 +16,7 @@ import { v4 as uuid } from 'uuid';
 import { GdriveService } from '../src/common/gdrive.service';
 import { JwtService } from '@nestjs/jwt';
 import { OrderStatus } from '../src/order/interface/http/order.response';
+import { UserModule } from '../src/user/user.module';
 
 describe('OrderController (e2e)', () => {
   let app: INestApplication;
@@ -71,6 +72,7 @@ describe('OrderController (e2e)', () => {
       imports: [
         CommonModule,
         ProcessModule,
+        UserModule,
         AuthModule,
         MulterModule.register({
           storage: diskStorage({
