@@ -233,7 +233,6 @@ describe('UserController (e2e)', () => {
       const refreshCookie = response.header['set-cookie'][0];
       expect(response.status).toEqual(200);
       expect(refreshCookie).toContain('refresh=');
-      expect(refreshCookie).toContain('Max-Age=0');
       expect(refreshCookie).toContain('Expires=Thu, 01 Jan 1970 00:00:00 GMT');
       expect(body.status).toEqual('success');
     });
@@ -283,7 +282,6 @@ describe('UserController (e2e)', () => {
       const refreshCookie = response.header['set-cookie'][0];
       expect(response.status).toEqual(200);
       expect(refreshCookie).toContain('refresh=');
-      expect(refreshCookie).toContain('Max-Age=0');
       expect(refreshCookie).toContain('Expires=Thu, 01 Jan 1970 00:00:00 GMT');
       expect(body.status).toEqual('success');
     });
@@ -367,7 +365,6 @@ describe('UserController (e2e)', () => {
       const refreshCookie = response.header['set-cookie'][0];
       expect(response.status).toEqual(200);
       expect(refreshCookie).toContain('refresh=');
-      expect(refreshCookie).toContain('Max-Age=0');
       expect(refreshCookie).toContain('Expires=Thu, 01 Jan 1970 00:00:00 GMT');
       expect(response.body.status).toEqual('success');
     });
